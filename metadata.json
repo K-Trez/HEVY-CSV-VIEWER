@@ -1,0 +1,6 @@
+{
+  "name": "Hevy Workout Vault & Analytics",
+  "description": "Interactive Hevy gym app CSV workout log viewer, personal record tracker, volume analytics, and muscle balance dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
