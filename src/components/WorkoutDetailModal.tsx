@@ -67,7 +67,7 @@ export const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
 
           <button
             onClick={onClose}
-            className="w-9 h-9 rounded-xl bg-[#0B0F17] text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC] flex items-center justify-center border border-[#1E293B] transition-colors shrink-0"
+            className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC] flex items-center justify-center border border-[#1E293B] transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
@@ -214,7 +214,7 @@ export const WorkoutDetailModal: React.FC<WorkoutDetailModalProps> = ({
         <div className="p-4 bg-[#0B0F17] border-t border-[#1E293B] flex items-center justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-semibold text-[#F8FAFC] bg-[#1E293B] border border-[#334155] hover:bg-[#2563EB] rounded-xl transition-colors"
+            className="px-4 py-2 text-xs font-bold text-[#F8FAFC] bg-[#1E293B] border border-[#334155] hover:bg-[#2563EB] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shadow-sm"
           >
             Close
           </button>

@@ -6,6 +6,7 @@ interface HeatmapCalendarProps {
   workouts: Workout[];
   unit: UnitPreference;
   onSelectWorkout: (workout: Workout) => void;
+  theme?: 'dark' | 'light';
 }
 
 interface YearCalendarData {
@@ -23,6 +24,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
   workouts,
   unit,
   onSelectWorkout,
+  theme = 'dark',
 }) => {
   // Extract all unique years available from workouts, sorted chronologically ascending (2025 at top, then 2026)
   const availableYears = useMemo(() => {
@@ -170,13 +172,14 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
     return allYearsData[0]?.monthLabels || [];
   }, [allYearsData]);
 
-  // Heatmap blue intensity
-  const getHeatmapColor = (count: number, volumeKg: number) => {
-    if (count === 0) return 'bg-[#1E293B]/60 border-[#334155]/40 hover:border-[#64748B]';
-    if (count === 1 && volumeKg < 6000) return 'bg-[#1E3A8A] border-[#2563EB]/70 hover:bg-[#1D4ED8]';
-    if (count === 1 && volumeKg < 12000) return 'bg-[#2563EB] border-[#3B82F6] hover:bg-[#3B82F6]';
-    if (count >= 2 || volumeKg >= 12000) return 'bg-[#3B82F6] border-[#60A5FA] text-white hover:bg-[#60A5FA] shadow-[0_0_8px_rgba(59,130,246,0.5)]';
-    return 'bg-[#38BDF8] border-[#7DD3FC] text-[#0B0F17] shadow-[0_0_10px_rgba(56,189,248,0.7)]';
+  // Heatmap intensity: strictly gray for rest, and ONLY #2ba2fb on days you worked out
+  const getHeatmapColor = (count: number) => {
+    if (count === 0) {
+      return theme === 'light'
+        ? 'heat-cube-0 bg-[#E2E8F0] border-[#CBD5E1] hover:border-[#94A3B8]'
+        : 'heat-cube-0 bg-[#1E293B]/60 border-[#334155]/40 hover:border-[#64748B]';
+    }
+    return 'heat-cube-workout bg-[#2ba2fb] border-[#1d8de0] hover:brightness-110 shadow-[0_0_5px_rgba(43,162,251,0.45)]';
   };
 
   const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -199,12 +202,12 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           </div>
         </div>
 
-        {/* Tab Controls & Overall Streak */}
+        {/* Tab Controls & Overall Streak (more square-y buttons with micro-interactions) */}
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1 bg-[#0B0F17] p-1 rounded-xl border border-[#1E293B] text-xs font-semibold">
+          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
             <button
               onClick={() => setSelectedTab('all')}
-              className={`px-3 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                 selectedTab === 'all'
                   ? 'bg-[#2563EB] text-white shadow-sm'
                   : 'text-[#94A3B8] hover:text-[#F8FAFC]'
@@ -216,7 +219,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
               <button
                 key={yr}
                 onClick={() => setSelectedTab(yr.toString())}
-                className={`px-3 py-1 rounded-lg transition-all ${
+                className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                   selectedTab === yr.toString()
                     ? 'bg-[#2563EB] text-white shadow-sm'
                     : 'text-[#94A3B8] hover:text-[#F8FAFC]'
@@ -227,7 +230,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A]/30 text-[#60A5FA] rounded-xl border border-[#2563EB]/40 font-semibold text-xs">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1E3A8A]/30 text-[#60A5FA] rounded-md border border-[#2563EB]/40 font-semibold text-xs">
             <Flame className="w-3.5 h-3.5 text-[#38BDF8] fill-[#38BDF8]" />
             <span>Best Streak: {totalStreakWeeks} wks</span>
           </div>
@@ -321,9 +324,9 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
                               onMouseLeave={() => setHoveredDay(null)}
                               className={`w-3 h-3 rounded-[2.5px] border cursor-pointer outline-none transition-colors ${
                                 hasWorkout
-                                  ? 'hover:ring-2 hover:ring-[#38BDF8] hover:ring-offset-1 hover:ring-offset-[#131D31]'
+                                  ? 'hover:ring-2 hover:ring-[#2ba2fb] hover:ring-offset-1 hover:ring-offset-[#131D31]'
                                   : 'cursor-default'
-                              } ${getHeatmapColor(day.workouts.length, dayVolumeKg)}`}
+                              } ${getHeatmapColor(day.workouts.length)}`}
                               aria-label={`${day.dateStr}: ${day.workouts.length} workout(s)`}
                             />
                           );
@@ -339,28 +342,31 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
       </div>
 
       {/* Bottom Legend */}
-      <div className="flex items-center justify-between text-xs text-[#94A3B8] pt-2 border-t border-[#1E293B]">
-        <div className="flex items-center gap-2 text-[11px]">
-          <span>Rest day</span>
-          <div className="flex items-center gap-1">
-            <span className="w-3 h-3 rounded-[2.5px] bg-[#1E293B]/60 border border-[#334155]/40"></span>
-            <span className="w-3 h-3 rounded-[2.5px] bg-[#1E3A8A] border border-[#2563EB]/70"></span>
-            <span className="w-3 h-3 rounded-[2.5px] bg-[#2563EB] border border-[#3B82F6]"></span>
-            <span className="w-3 h-3 rounded-[2.5px] bg-[#3B82F6] border border-[#60A5FA]"></span>
-            <span className="w-3 h-3 rounded-[2.5px] bg-[#38BDF8] border border-[#7DD3FC]"></span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-[#94A3B8] pt-2.5 border-t border-[#1E293B] gap-2">
+        <div className="flex items-center gap-4 text-[11px] flex-wrap">
+          <div className="flex items-center gap-1.5">
+            <span className={`w-3 h-3 rounded-[2px] ${theme === 'light' ? 'bg-[#E2E8F0] border border-[#CBD5E1]' : 'bg-[#1E293B]/70 border border-[#334155]/50'}`} title="0 workouts (Rest)"></span>
+            <span>Rest day</span>
           </div>
-          <span>Heavy session / High volume</span>
+          <div className="flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-[2px] bg-[#2ba2fb] border border-[#1d8de0] shadow-[0_0_5px_rgba(43,162,251,0.5)]" title="Workout logged"></span>
+            <span className="font-semibold text-[#F8FAFC]">Workout logged</span>
+          </div>
         </div>
 
         <div className="text-[11px] text-[#64748B]">
-          Click any blue square to inspect that workout
+          Click any active square to inspect workout
         </div>
       </div>
 
       {/* Floating Hover Tooltip */}
       {hoveredDay && (
         <div
-          className="fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 bg-[#0F172A] text-white text-xs rounded-xl py-2 px-3 shadow-2xl border border-[#334155] min-w-[190px] animate-in fade-in"
+          className={`fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] animate-in fade-in ${
+            theme === 'light'
+              ? 'bg-[#FAF6F0] text-[#2D2117] border-[#DAC6B2] shadow-[0_10px_25px_-5px_rgba(110,90,75,0.2)]'
+              : 'bg-[#0F172A] text-white border-[#334155]'
+          }`}
           style={{ left: `${hoveredDay.x}px`, top: `${hoveredDay.y}px` }}
         >
           <div className="font-semibold text-[11px] text-[#94A3B8]">

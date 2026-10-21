@@ -7,6 +7,7 @@ import { HeatmapCalendar } from './components/HeatmapCalendar';
 import { WorkoutList } from './components/WorkoutList';
 import { ExerciseAnalytics } from './components/ExerciseAnalytics';
 import { MuscleDistribution } from './components/MuscleDistribution';
+import { MuscleRadarChart } from './components/MuscleRadarChart';
 import { UploadModal } from './components/UploadModal';
 import { WorkoutDetailModal } from './components/WorkoutDetailModal';
 import { Dumbbell, ArrowRight, Trophy, UploadCloud, FileSpreadsheet, Smartphone, AlertCircle } from 'lucide-react';
@@ -152,8 +153,25 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const saved = localStorage.getItem('hevy_vault_theme');
+    return saved === 'light' ? 'light' : 'dark';
+  });
+
+  const handleToggleTheme = () => {
+    setTheme(prev => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('hevy_vault_theme', next);
+      return next;
+    });
+  };
+
   return (
-    <div className="min-h-screen bg-[#0B0F17] text-[#F1F5F9] flex flex-col font-sans">
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+      theme === 'dark'
+        ? 'theme-dark bg-[#0B0F17] text-[#F1F5F9]'
+        : 'theme-light bg-[#F5ECE1] text-[#2D2117]'
+    }`}>
       {/* Navigation Header */}
       <Header
         unit={unit}
@@ -163,6 +181,8 @@ export default function App() {
         onClearData={handleClearData}
         activeView={activeView}
         onChangeView={setActiveView}
+        theme={theme}
+        onToggleTheme={handleToggleTheme}
       />
 
       {/* Main Container */}
@@ -171,8 +191,8 @@ export default function App() {
         {!parsedData && (
           <div className="max-w-2xl mx-auto py-12 space-y-6 animate-in fade-in">
             <div className="text-center space-y-3">
-              <div className="w-16 h-16 rounded-3xl bg-[#2563EB] text-white flex items-center justify-center mx-auto shadow-[0_0_25px_rgba(37,99,235,0.45)]">
-                <Dumbbell className="w-8 h-8 stroke-[2.2]" />
+              <div className="w-14 h-14 rounded-md bg-[#2563EB] text-white flex items-center justify-center mx-auto shadow-sm transition-transform hover:scale-105 duration-200">
+                <Dumbbell className="w-7 h-7 stroke-[2.2]" />
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC]">
                 Hevy Workout Vault
@@ -183,7 +203,7 @@ export default function App() {
             </div>
 
             {uploadError && (
-              <div className="p-3.5 rounded-xl bg-[#7F1D1D]/30 border border-[#DC2626]/40 text-[#FCA5A5] text-xs flex items-center gap-2">
+              <div className="p-3.5 rounded-md bg-[#7F1D1D]/30 border border-[#DC2626]/40 text-[#FCA5A5] text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{uploadError}</span>
               </div>
@@ -197,7 +217,7 @@ export default function App() {
                 setDragActive(true);
               }}
               onDragLeave={() => setDragActive(false)}
-              className={`border-2 border-dashed rounded-3xl p-10 text-center transition-all bg-[#131D31] ${
+              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all bg-[#131D31] ${
                 dragActive
                   ? 'border-[#3B82F6] bg-[#1E3A8A]/20'
                   : 'border-[#1E293B] hover:border-[#3B82F6]/60'
@@ -212,7 +232,7 @@ export default function App() {
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <label className="px-5 py-2.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] cursor-pointer transition-all active:scale-95">
+                <label className="px-5 py-2.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md shadow-sm cursor-pointer transition-all duration-150 hover:-translate-y-0.5 active:scale-95">
                   Choose CSV File
                   <input
                     type="file"
@@ -227,7 +247,7 @@ export default function App() {
                 </label>
                 <button
                   onClick={() => setIsUploadModalOpen(true)}
-                  className="px-4 py-2.5 text-xs font-semibold text-[#CBD5E1] bg-[#0B0F17] hover:bg-[#1E293B] border border-[#1E293B] rounded-xl transition-colors"
+                  className="px-4 py-2.5 text-xs font-bold text-[#CBD5E1] bg-[#0B0F17] hover:bg-[#1E293B] border border-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
                 >
                   Paste CSV Text
                 </button>
@@ -303,6 +323,17 @@ export default function App() {
                   workouts={parsedData.workouts}
                   unit={unit}
                   onSelectWorkout={setSelectedWorkoutForModal}
+                  theme={theme}
+                />
+
+                {/* Radar Chart (Spider Chart / Web Chart) on the Overview Tab */}
+                <MuscleRadarChart
+                  workouts={parsedData.workouts}
+                  unit={unit}
+                  theme={theme}
+                  onSelectCategory={(_muscle) => {
+                    setActiveView('muscles');
+                  }}
                 />
 
                 {/* Split Row: Recent Workouts & Key Milestones */}
@@ -323,7 +354,7 @@ export default function App() {
 
                         <button
                           onClick={() => setActiveView('workouts')}
-                          className="text-xs font-semibold text-[#38BDF8] hover:underline flex items-center gap-1"
+                          className="text-xs font-bold text-[#38BDF8] hover:underline flex items-center gap-1 transition-transform hover:translate-x-0.5 duration-150"
                         >
                           <span>View All ({parsedData.totalWorkouts})</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -337,7 +368,7 @@ export default function App() {
                             <div
                               key={w.id}
                               onClick={() => setSelectedWorkoutForModal(w)}
-                              className="py-3 flex items-center justify-between gap-3 hover:bg-[#1E293B]/40 px-2 rounded-xl cursor-pointer transition-colors"
+                              className="py-3 flex items-center justify-between gap-3 hover:bg-[#1E293B]/40 px-2.5 rounded-md cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
                             >
                               <div>
                                 <div className="font-bold text-xs sm:text-sm text-[#F8FAFC]">
@@ -365,7 +396,7 @@ export default function App() {
                     <div className="mt-4 pt-3 border-t border-[#1E293B] text-center">
                       <button
                         onClick={() => setActiveView('workouts')}
-                        className="w-full py-2 text-xs font-semibold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-xl transition-colors border border-[#1E293B]"
+                        className="w-full py-2.5 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
                       >
                         Open Full Workout Log Explorer
                       </button>
@@ -388,14 +419,14 @@ export default function App() {
 
                         <button
                           onClick={() => setActiveView('exercises')}
-                          className="text-xs font-semibold text-[#38BDF8] hover:underline flex items-center gap-1"
+                          className="text-xs font-bold text-[#38BDF8] hover:underline flex items-center gap-1 transition-transform hover:translate-x-0.5 duration-150"
                         >
                           <span>Explore</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <div className="space-y-2.5">
+                      <div className="space-y-2">
                         {Object.values(parsedData.exerciseStats)
                           .sort((a, b) => b.totalSets - a.totalSets)
                           .slice(0, 5)
@@ -407,7 +438,7 @@ export default function App() {
                               <div
                                 key={ex.exerciseTitle}
                                 onClick={() => handleDrillDownExercise(ex.exerciseTitle)}
-                                className="p-2.5 rounded-xl bg-[#0B0F17] border border-[#1E293B] hover:border-[#3B82F6]/50 flex items-center justify-between cursor-pointer transition-all"
+                                className="p-2.5 rounded-md bg-[#0B0F17] border border-[#1E293B] hover:border-[#3B82F6]/50 flex items-center justify-between cursor-pointer transition-all duration-150 hover:-translate-y-0.5 active:scale-[0.99]"
                               >
                                 <div className="min-w-0 pr-2">
                                   <div className="font-bold text-xs text-[#F8FAFC] truncate">
@@ -422,7 +453,7 @@ export default function App() {
                                   <div className="font-extrabold text-xs text-[#F8FAFC] tabular-nums font-mono">
                                     {topWeight > 0 ? `${topWeight} ${unit}` : 'BW'}
                                   </div>
-                                  <div className="text-[10px] text-[#38BDF8] font-semibold tabular-nums font-mono">
+                                  <div className="text-[10px] text-[#38BDF8] font-bold tabular-nums font-mono">
                                     Est. 1RM: {top1RM} {unit}
                                   </div>
                                 </div>
@@ -435,7 +466,7 @@ export default function App() {
                     <div className="mt-4 pt-3 border-t border-[#1E293B] text-center">
                       <button
                         onClick={() => setActiveView('muscles')}
-                        className="w-full py-2 text-xs font-semibold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-xl transition-colors border border-[#1E293B]"
+                        className="w-full py-2.5 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
                       >
                         Check Kinetic Muscle Balance (Push/Pull/Legs)
                       </button>
@@ -464,6 +495,7 @@ export default function App() {
                   exerciseStats={parsedData.exerciseStats}
                   unit={unit}
                   initialSelectedExercise={selectedExerciseForAnalytics}
+                  theme={theme}
                 />
               </div>
             )}
