@@ -298,7 +298,7 @@ export default function App() {
                   dateRangeStr={dateRangeStr}
                 />
 
-                {/* Activity Heatmap Calendar */}
+                {/* Activity Heatmap Calendar (At the top, not bottom!) */}
                 <HeatmapCalendar
                   workouts={parsedData.workouts}
                   unit={unit}
@@ -481,20 +481,6 @@ export default function App() {
           </>
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="mt-auto border-t border-[#1E293B] bg-[#0B0F17] px-6 py-6 text-center text-xs text-[#64748B]">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="font-bold text-[#F8FAFC]">Hevy Vault</span>
-            <span>·</span>
-            <span className="text-[#94A3B8]">Offline-first workout CSV analytics</span>
-          </div>
-          <div className="text-[11px] text-[#64748B]">
-            Data parsed strictly in your browser · No external trackers
-          </div>
-        </div>
-      </footer>
 
       {/* Modals */}
       <UploadModal
