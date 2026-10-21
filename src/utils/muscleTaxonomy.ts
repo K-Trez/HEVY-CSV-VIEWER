@@ -38,6 +38,9 @@ const EXERCISE_MAPPINGS: Array<{
   // Arms - Triceps
   { pattern: /tricep|skull crusher|pushdown|french press|jm press|kickback|triceps extension/i, primary: 'Triceps' },
 
+  // Arms - Forearms
+  { pattern: /wrist curl|forearm|reverse curl|finger curl|grip|farmer walk|dead hang/i, primary: 'Forearms', secondary: 'Biceps' },
+
   // Calves
   { pattern: /calf raise|calves|seated calf|standing calf/i, primary: 'Calves' },
 
@@ -68,6 +71,7 @@ export const MUSCLE_COLORS: Record<MuscleGroup, { bg: string; text: string; bar:
   Glutes: { bg: 'bg-[#831843]/30', text: 'text-[#F472B6]', bar: 'bg-[#EC4899]', border: 'border-[#DB2777]/40' },
   Biceps: { bg: 'bg-[#0C4A6E]/30', text: 'text-[#38BDF8]', bar: 'bg-[#0284C7]', border: 'border-[#0369A1]/40' },
   Triceps: { bg: 'bg-[#1E1B4B]/40', text: 'text-[#818CF8]', bar: 'bg-[#4F46E5]', border: 'border-[#3730A3]/40' },
+  Forearms: { bg: 'bg-[#0E7490]/30', text: 'text-[#22D3EE]', bar: 'bg-[#06B6D4]', border: 'border-[#0891B2]/40' },
   Core: { bg: 'bg-[#14532D]/30', text: 'text-[#4ADE80]', bar: 'bg-[#22C55E]', border: 'border-[#16A34A]/40' },
   Calves: { bg: 'bg-[#1E293B]/50', text: 'text-[#94A3B8]', bar: 'bg-[#64748B]', border: 'border-[#475569]/40' },
   'Full Body': { bg: 'bg-[#1E293B]', text: 'text-[#CBD5E1]', bar: 'bg-[#3B82F6]', border: 'border-[#334155]' },

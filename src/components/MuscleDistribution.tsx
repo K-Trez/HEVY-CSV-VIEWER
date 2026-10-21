@@ -204,7 +204,7 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
                     <button
                       key={exName}
                       onClick={() => onSelectExercise && onSelectExercise(exName)}
-                      className="text-[10px] text-[#94A3B8] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#F8FAFC] px-2 py-0.5 rounded-md border border-[#1E293B] transition-colors"
+                      className="text-[10px] font-semibold text-[#94A3B8] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#F8FAFC] px-2 py-0.5 rounded-sm border border-[#1E293B] transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
                     >
                       {exName}
                     </button>

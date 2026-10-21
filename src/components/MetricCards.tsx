@@ -41,9 +41,9 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <Dumbbell className="w-3.5 h-3.5" />
           </div>
         </div>
-        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
           {formattedVolume}
-          <span className="text-sm font-semibold text-[#60A5FA] ml-1.5 font-sans">{unit}</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#60A5FA] ml-1.5 font-sans">{unit}</span>
         </div>
         <div className="mt-2 text-xs text-[#94A3B8] flex items-center gap-1.5">
           <span>~{elephants} African elephants</span>
@@ -58,9 +58,9 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <Activity className="w-3.5 h-3.5" />
           </div>
         </div>
-        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
           {totalWorkouts}
-          <span className="text-sm font-semibold text-[#38BDF8] ml-1.5 font-sans">sessions</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#38BDF8] ml-1.5 font-sans">sessions</span>
         </div>
         <div className="mt-2 text-xs text-[#94A3B8]">
           <span>{dateRangeStr || 'Training history'}</span>
@@ -75,9 +75,9 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <Flame className="w-3.5 h-3.5" />
           </div>
         </div>
-        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
           {totalSets.toLocaleString()}
-          <span className="text-sm font-semibold text-[#34D399] ml-1 font-sans">sets</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#34D399] ml-1 font-sans">sets</span>
         </div>
         <div className="mt-2 text-xs text-[#94A3B8] flex items-center gap-1.5">
           <span>{totalReps.toLocaleString()} reps</span>
@@ -94,9 +94,9 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <Clock className="w-3.5 h-3.5" />
           </div>
         </div>
-        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#F8FAFC] tabular-nums font-mono">
           {totalHours}
-          <span className="text-sm font-semibold text-[#818CF8] ml-1.5 font-sans">hrs</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#818CF8] ml-1.5 font-sans">hrs</span>
         </div>
         <div className="mt-2 text-xs text-[#94A3B8]">
           <span>~{totalWorkouts > 0 ? Math.round((totalHours * 60) / totalWorkouts) : 0} min avg workout</span>
@@ -111,9 +111,9 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
             <Trophy className="w-3.5 h-3.5" />
           </div>
         </div>
-        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#38BDF8] tabular-nums font-mono">
+        <div className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-[#38BDF8] tabular-nums font-mono">
           {totalPRs}
-          <span className="text-sm font-semibold text-[#94A3B8] ml-1.5 font-sans">records</span>
+          <span className="text-xs sm:text-sm font-semibold text-[#94A3B8] ml-1.5 font-sans">records</span>
         </div>
         <div className="mt-2 text-xs text-[#94A3B8]">
           <span>Broken across sessions</span>

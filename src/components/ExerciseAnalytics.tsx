@@ -7,12 +7,14 @@ interface ExerciseAnalyticsProps {
   exerciseStats: Record<string, ExerciseStats>;
   unit: UnitPreference;
   initialSelectedExercise?: string;
+  theme?: 'dark' | 'light';
 }
 
 export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
   exerciseStats,
   unit,
   initialSelectedExercise,
+  theme = 'dark',
 }) => {
   const exercisesList = useMemo(() => {
     return Object.values(exerciseStats).sort((a, b) => b.totalSets - a.totalSets);
@@ -129,7 +131,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
       {/* Left Column: Exercise Search & Directory */}
-      <div className="lg:col-span-4 bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm p-4 flex flex-col h-[700px]">
+      <div className="lg:col-span-4 bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm p-4 flex flex-col h-[340px] sm:h-[420px] lg:h-[700px]">
         <div className="mb-3">
           <h2 className="text-sm font-bold text-[#F8FAFC] mb-2 flex items-center justify-between">
             <span>Exercise Library</span>
@@ -146,17 +148,17 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
               placeholder="Filter exercises..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-xl text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6]"
+              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6] transition-colors"
             />
           </div>
 
-          {/* Muscle filter pills */}
+          {/* Muscle filter pills: square-y */}
           <div className="flex gap-1 overflow-x-auto pb-1 text-[11px] no-scrollbar">
             <button
               onClick={() => setSelectedMuscle('all')}
-              className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors ${
+              className={`px-2.5 py-1 rounded-sm font-bold whitespace-nowrap transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                 selectedMuscle === 'all'
-                  ? 'bg-[#2563EB] text-white'
+                  ? 'bg-[#2563EB] text-white shadow-sm'
                   : 'bg-[#1E293B] text-[#94A3B8] hover:text-[#F8FAFC]'
               }`}
             >
@@ -166,9 +168,9 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
               <button
                 key={m}
                 onClick={() => setSelectedMuscle(m)}
-                className={`px-2.5 py-1 rounded-lg font-medium whitespace-nowrap transition-colors ${
+                className={`px-2.5 py-1 rounded-sm font-bold whitespace-nowrap transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                   selectedMuscle === m
-                    ? 'bg-[#2563EB] text-white'
+                    ? 'bg-[#2563EB] text-white shadow-sm'
                     : 'bg-[#1E293B] text-[#94A3B8] hover:text-[#F8FAFC]'
                 }`}
               >
@@ -178,7 +180,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
           </div>
         </div>
 
-        {/* Scrollable Exercises List */}
+        {/* Scrollable Exercises List: square-y items with micro-interactions */}
         <div className="flex-1 overflow-y-auto space-y-1.5 pr-1">
           {filteredExercises.map(ex => {
             const isSelected = ex.exerciseTitle === currentExercise?.exerciseTitle;
@@ -190,9 +192,9 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
               <button
                 key={ex.exerciseTitle}
                 onClick={() => setSelectedTitle(ex.exerciseTitle)}
-                className={`w-full text-left p-2.5 rounded-xl transition-all border flex items-center justify-between gap-2 ${
+                className={`w-full text-left p-2.5 rounded-md transition-all duration-150 border flex items-center justify-between gap-2 hover:-translate-y-0.5 active:scale-[0.99] ${
                   isSelected
-                    ? 'bg-[#1E3A8A]/40 border-[#3B82F6]/60 text-[#F8FAFC] shadow-[0_0_12px_rgba(37,99,235,0.2)]'
+                    ? 'bg-[#1E3A8A]/40 border-[#3B82F6]/60 text-[#F8FAFC] shadow-sm'
                     : 'bg-[#0B0F17]/40 border-transparent hover:bg-[#1E293B]/60 hover:border-[#1E293B]'
                 }`}
               >
@@ -312,11 +314,11 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                 </div>
               </div>
 
-              {/* Metric Mode Switcher */}
-              <div className="flex items-center gap-1 bg-[#0B0F17] p-1 rounded-xl border border-[#1E293B] text-xs font-semibold">
+              {/* Metric Mode Switcher: Square-y buttons */}
+              <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
                 <button
                   onClick={() => setMetricMode('1rm')}
-                  className={`px-3 py-1 rounded-lg transition-all ${
+                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                     metricMode === '1rm' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                   }`}
                 >
@@ -324,7 +326,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                 </button>
                 <button
                   onClick={() => setMetricMode('weight')}
-                  className={`px-3 py-1 rounded-lg transition-all ${
+                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                     metricMode === 'weight' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                   }`}
                 >
@@ -332,7 +334,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                 </button>
                 <button
                   onClick={() => setMetricMode('volume')}
-                  className={`px-3 py-1 rounded-lg transition-all ${
+                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
                     metricMode === 'volume' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
                   }`}
                 >
@@ -355,8 +357,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                   >
                     <defs>
                       <linearGradient id="chartGradientBlue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#3B82F6" stopOpacity="0.35" />
-                        <stop offset="100%" stopColor="#3B82F6" stopOpacity="0.0" />
+                        <stop offset="0%" stopColor={theme === 'light' ? '#FB923C' : '#3B82F6'} stopOpacity="0.4" />
+                        <stop offset="100%" stopColor={theme === 'light' ? '#FB923C' : '#3B82F6'} stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
@@ -366,8 +368,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                       const val = Math.round(chartData.yMin + pct * (chartData.yMax - chartData.yMin));
                       return (
                         <g key={idx}>
-                          <line x1="40" y1={y} x2="690" y2={y} stroke="#1E293B" strokeDasharray="3 3" />
-                          <text x="35" y={y + 4} textAnchor="end" fontSize="10" fill="#64748B" fontFamily="monospace">
+                          <line x1="40" y1={y} x2="690" y2={y} stroke={theme === 'light' ? '#DAC6B2' : '#1E293B'} strokeDasharray="3 3" />
+                          <text x="35" y={y + 4} textAnchor="end" fontSize="10" fill={theme === 'light' ? '#9E8674' : '#64748B'} fontFamily="monospace">
                             {val}
                           </text>
                         </g>
@@ -378,9 +380,12 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                     {(() => {
                       const coords = chartData.coords;
                       const n = coords.length;
+                      const strokeColor = theme === 'light' ? '#EA580C' : '#38BDF8';
+                      const dotBg = theme === 'light' ? '#FAF6F0' : '#0B0F17';
+
                       if (n === 1) {
                         return (
-                          <circle cx={coords[0].x} cy={coords[0].y} r="6" fill="#3B82F6" />
+                          <circle cx={coords[0].x} cy={coords[0].y} r="6" fill={strokeColor} />
                         );
                       }
 
@@ -393,7 +398,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                           <polyline
                             points={pointsString}
                             fill="none"
-                            stroke="#38BDF8"
+                            stroke={strokeColor}
                             strokeWidth="2.5"
                             strokeLinecap="round"
                             strokeLinejoin="round"
@@ -406,8 +411,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                               cx={c.x}
                               cy={c.y}
                               r="3.5"
-                              fill="#0B0F17"
-                              stroke="#38BDF8"
+                              fill={dotBg}
+                              stroke={strokeColor}
                               strokeWidth="2"
                               className="pointer-events-none"
                             />
@@ -421,7 +426,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                                 y1="20"
                                 x2={activeCoord.x}
                                 y2="210"
-                                stroke="#38BDF8"
+                                stroke={strokeColor}
                                 strokeWidth="1.5"
                                 strokeDasharray="3 3"
                                 opacity="0.75"
@@ -430,7 +435,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                                 cx={activeCoord.x}
                                 cy={activeCoord.y}
                                 r="6.5"
-                                fill="#38BDF8"
+                                fill={strokeColor}
                                 stroke="#FFFFFF"
                                 strokeWidth="2.5"
                               />
@@ -464,10 +469,14 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
               </div>
             )}
 
-            {/* Stable Tooltip pinned to activeCoord */}
+            {/* Stable Tooltip pinned to activeCoord: square-y and themed */}
             {activeCoord && (
               <div
-                className="absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-full bg-[#0F172A] text-white text-xs rounded-xl py-2 px-3 shadow-2xl border border-[#334155] min-w-[190px]"
+                className={`absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-full text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] ${
+                  theme === 'light'
+                    ? 'bg-[#FAF6F0] text-[#2D2117] border-[#DAC6B2] shadow-[0_10px_25px_-5px_rgba(110,90,75,0.2)]'
+                    : 'bg-[#0F172A] text-white border-[#334155]'
+                }`}
                 style={{
                   left: `${(activeCoord.x / 700) * 100}%`,
                   top: '60px',

@@ -83,7 +83,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search workouts, routines, or exercises (e.g. Bench, Squat)..."
-            className="w-full pl-10 pr-4 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-xl text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6] transition-colors"
+            className="w-full pl-10 pr-4 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6] transition-colors"
           />
         </div>
 
@@ -95,7 +95,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             <select
               value={routineFilter}
               onChange={e => setRoutineFilter(e.target.value)}
-              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-xl text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
             >
               <option value="all">All Routines ({workouts.length})</option>
               {uniqueRoutines.map(r => (
@@ -112,7 +112,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as any)}
-              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-xl text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
             >
               <option value="date-desc">Newest First</option>
               <option value="date-asc">Oldest First</option>
@@ -120,18 +120,18 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             </select>
           </div>
 
-          {/* Expand/Collapse Toggle */}
+          {/* Expand/Collapse Toggle: square-y buttons */}
           <div className="flex items-center gap-1 border-l border-[#1E293B] pl-2 text-xs">
             <button
               onClick={expandAll}
-              className="px-2 py-1.5 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-lg transition-colors"
+              className="px-2.5 py-1 text-xs font-bold text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
               title="Expand all workouts"
             >
               Expand
             </button>
             <button
               onClick={collapseAll}
-              className="px-2 py-1.5 text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-lg transition-colors"
+              className="px-2.5 py-1 text-xs font-bold text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
               title="Collapse all workouts"
             >
               Collapse
@@ -245,12 +245,12 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                           e.stopPropagation();
                           onSelectWorkout(workout);
                         }}
-                        className="px-3 py-1.5 text-xs font-semibold text-[#E2E8F0] bg-[#1E293B] hover:bg-[#2563EB] hover:text-white rounded-xl transition-colors whitespace-nowrap"
+                        className="px-3 py-1.5 text-xs font-bold text-[#E2E8F0] bg-[#1E293B] hover:bg-[#2563EB] hover:text-white rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 whitespace-nowrap shadow-sm"
                       >
                         Inspect
                       </button>
                       <button
-                        className="w-8 h-8 rounded-xl bg-[#0B0F17] text-[#94A3B8] flex items-center justify-center hover:bg-[#1E293B] hover:text-[#F8FAFC] transition-colors"
+                        className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] flex items-center justify-center hover:bg-[#1E293B] hover:text-[#F8FAFC] transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
                         aria-label={isExpanded ? 'Collapse' : 'Expand'}
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
