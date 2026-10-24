@@ -174,12 +174,12 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
     return radarData.reduce((acc, d) => acc + (metricMode === 'sets' ? d.sets : d.volume), 0) || 1;
   }, [radarData, metricMode]);
 
-  // Geometry calculations for 10-pointed star/radar
-  const width = 420;
-  const height = 380;
+  // Geometry calculations for 10-pointed star/radar: safely contained within viewBox 480x430
+  const width = 480;
+  const height = 430;
   const centerX = width / 2;
   const centerY = height / 2;
-  const radius = 112; // Max radius for data polygon
+  const radius = 108; // Max radius for data polygon
   const numAxes = radarData.length;
   const angleStep = (2 * Math.PI) / numAxes;
 
@@ -233,7 +233,7 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
   const activeDim = hoveredIndex !== null ? radarData[hoveredIndex] : null;
 
   return (
-    <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm relative space-y-4">
+    <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm relative space-y-4">
       {/* Header with Title and Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
@@ -251,41 +251,47 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
           </p>
         </div>
 
-        {/* Metric Toggle: Sets vs Volume */}
-        <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold self-start sm:self-auto shrink-0">
-          <button
-            onClick={() => setMetricMode('sets')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-              metricMode === 'sets'
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            <Layers className="w-3 h-3" />
-            <span>Sets</span>
-          </button>
-          <button
-            onClick={() => setMetricMode('volume')}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-              metricMode === 'volume'
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            <Weight className="w-3 h-3" />
-            <span>Volume ({unit})</span>
-          </button>
+        {/* Metric, View Mode, & Scroll Controls */}
+        <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
+
+          {/* Metric Toggle: Sets vs Volume */}
+          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
+            <button
+              onClick={() => setMetricMode('sets')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+                metricMode === 'sets'
+                  ? 'bg-[#2563EB] text-white shadow-sm'
+                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+              }`}
+            >
+              <Layers className="w-3 h-3" />
+              <span>Sets</span>
+            </button>
+            <button
+              onClick={() => setMetricMode('volume')}
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+                metricMode === 'volume'
+                  ? 'bg-[#2563EB] text-white shadow-sm'
+                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+              }`}
+            >
+              <Weight className="w-3 h-3" />
+              <span>Volume ({unit})</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Radar Layout: SVG Radar + Side Stat Breakdown */}
+      {/* Main Radar Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
-        {/* Left Column: Responsive SVG 10-pointed Spider Chart */}
-        <div className="lg:col-span-7 flex flex-col items-center justify-center relative min-h-[340px] sm:min-h-[380px]">
-          <svg
-            viewBox={`0 0 ${width} ${height}`}
-            className="w-full max-w-[390px] sm:max-w-[430px] aspect-[420/380] overflow-visible select-none drop-shadow-md"
-          >
+          {/* Left Column: Responsive SVG 10-pointed Spider Chart (shrinks to fit screen) */}
+          <div className="lg:col-span-7 flex flex-col items-center justify-center relative w-full">
+            <div className="w-full rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-3 flex flex-col items-center justify-center">
+              <div className="w-full max-w-[440px] mx-auto flex flex-col items-center">
+                <svg
+                  viewBox={`0 0 ${width} ${height}`}
+                  className="w-full max-w-[440px] h-auto aspect-[440/395] select-none drop-shadow-md mx-auto transition-all"
+                >
             <defs>
               {/* Radial gradient for data web polygon */}
               <radialGradient id="radarGlow10" cx="50%" cy="50%" r="50%">
@@ -375,10 +381,12 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
               return (
                 <g
                   key={`label-${d.key}`}
-                  className="cursor-pointer group"
+                  className="cursor-pointer group select-none"
                   onMouseEnter={() => setHoveredIndex(i)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  onClick={() => onSelectCategory && onSelectCategory(d.label)}
+                  onClick={() => {
+                    setHoveredIndex(prev => (prev === i ? null : i));
+                  }}
                 >
                   <text
                     x={lx}
@@ -407,12 +415,14 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                   className="cursor-pointer"
                   onMouseEnter={() => setHoveredIndex(i)}
                   onMouseLeave={() => setHoveredIndex(null)}
-                  onClick={() => onSelectCategory && onSelectCategory(pt.dim.label)}
+                  onClick={() => {
+                    setHoveredIndex(prev => (prev === i ? null : i));
+                  }}
                 >
-                  {/* Invisible hit-area */}
-                  <circle cx={pt.x} cy={pt.y} r="14" fill="transparent" />
+                  {/* Generous touch/hover hit-area */}
+                  <circle cx={pt.x} cy={pt.y} r="18" fill="transparent" />
 
-                  {/* Pulsing ring on hover */}
+                  {/* Pulsing ring on hover/selection */}
                   {isHovered && (
                     <circle
                       cx={pt.x}
@@ -441,57 +451,20 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
             })}
           </svg>
 
-          {/* Quick Info Chip Under Radar */}
-          <div className="flex items-center gap-2 text-[11px] text-[#94A3B8] mt-1">
-            <Sparkles className="w-3.5 h-3.5 text-[#2ba2fb]" />
-            <span>Hover on vertices to inspect muscle volume share</span>
+                {/* Quick Info Chip Under Radar */}
+                <div className="flex items-center gap-1.5 text-[11px] text-[#94A3B8] mt-2 text-center">
+                  <Sparkles className="w-3.5 h-3.5 text-[#2ba2fb] shrink-0" />
+                  <span>Hover or tap vertices to inspect volume & set shares</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
 
         {/* Right Column: Detailed Metric Breakdown & Ranked Muscle Bars */}
         <div className="lg:col-span-5 space-y-3.5">
-          {/* Active Hover Card (or default top muscle summary) */}
-          <div className="bg-[#0B0F17] rounded-xl p-3.5 border border-[#1E293B] shadow-inner min-h-[92px] flex flex-col justify-center transition-all">
-            {activeDim ? (
-              <div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-[#F8FAFC] flex items-center gap-1.5">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#2ba2fb] inline-block animate-pulse" />
-                    {activeDim.label} Focus
-                  </span>
-                  <span className="text-[10px] font-mono text-[#2ba2fb] bg-[#0C4A6E]/40 px-2 py-0.5 rounded border border-[#0284C7]/40">
-                    {Math.round(((metricMode === 'sets' ? activeDim.sets : activeDim.volume) / totalMetricSum) * 100)}% of total
-                  </span>
-                </div>
-                <div className="grid grid-cols-2 gap-2 mt-2 pt-2 border-t border-[#1E293B]/60">
-                  <div>
-                    <div className="text-[10px] text-[#94A3B8]">Total Working Sets</div>
-                    <div className="text-sm font-extrabold text-[#F8FAFC] font-mono">
-                      {activeDim.sets.toLocaleString()} <span className="text-[10px] text-[#94A3B8] font-sans">sets</span>
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-[10px] text-[#94A3B8]">Cumulative Volume</div>
-                    <div className="text-sm font-extrabold text-[#F8FAFC] font-mono">
-                      {activeDim.volume.toLocaleString()} <span className="text-[10px] text-[#94A3B8] font-sans">{unit}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div>
-                <div className="text-xs font-bold text-[#F8FAFC] mb-1">
-                  10-Zone Distribution Summary
-                </div>
-                <p className="text-[11px] text-[#94A3B8] leading-relaxed">
-                  Hover over any vertex or bar to inspect details for Chest, Back, Forearms, Biceps, Triceps, Core, Quads, Hams, Glutes, and Calves.
-                </p>
-              </div>
-            )}
-          </div>
 
-          {/* Ranked Progress Bars */}
-          <div className="space-y-1.5 max-h-[260px] overflow-y-auto pr-1">
+          {/* Ranked Progress Bars (Fits full natural height) */}
+          <div className="space-y-1.5 w-full">
             {radarData
               .slice()
               .sort((a, b) => (metricMode === 'sets' ? b.sets - a.sets : b.volume - a.volume))

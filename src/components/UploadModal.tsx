@@ -107,16 +107,16 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0B0F17]/80 backdrop-blur-md animate-in fade-in">
-      <div className="bg-[#131D31] rounded-3xl max-w-xl w-full border border-[#1E293B] shadow-2xl overflow-hidden animate-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#0B0F17]/80 backdrop-blur-md animate-in fade-in">
+      <div className="bg-[#131D31] rounded-2xl sm:rounded-3xl max-w-xl w-full border border-[#1E293B] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-in zoom-in-95">
         {/* Modal Header */}
-        <div className="p-5 sm:p-6 border-b border-[#1E293B] flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-[#1E293B] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-md bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center shrink-0">
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-base font-bold text-[#F8FAFC]">
+              <h3 className="text-sm sm:text-base font-bold text-[#F8FAFC]">
                 Load Hevy Workout Data
               </h3>
               <p className="text-xs text-[#94A3B8] mt-0.5">
@@ -126,14 +126,14 @@ export const UploadModal: React.FC<UploadModalProps> = ({
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC] flex items-center justify-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
+            className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC] flex items-center justify-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B] shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center border-b border-[#1E293B] px-6 bg-[#0B0F17]/40 text-xs font-semibold">
+        <div className="flex items-center border-b border-[#1E293B] px-4 sm:px-6 bg-[#0B0F17]/40 text-xs font-semibold">
           <button
             onClick={() => setActiveTab('upload')}
             className={`py-3 px-3 border-b-2 transition-colors ${
@@ -157,7 +157,7 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         </div>
 
         {/* Content Body */}
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           {errorMessage && (
             <div className="mb-4 p-3 rounded-xl bg-[#7F1D1D]/30 border border-[#DC2626]/40 text-[#FCA5A5] text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />

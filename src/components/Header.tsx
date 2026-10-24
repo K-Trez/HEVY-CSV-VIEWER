@@ -162,12 +162,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile view navigation tab bar: Square-y buttons with horizontal touch scrolling */}
+      {/* Mobile view navigation tab bar: Shrink to fit screen perfectly without overflow */}
       {activeDataset && (
-        <div className="md:hidden flex items-center gap-1.5 mt-2 pt-2 border-t border-[#1E293B] overflow-x-auto pb-0.5 select-none no-scrollbar">
+        <div className="md:hidden grid grid-cols-4 gap-1 mt-2 pt-2 border-t border-[#1E293B] w-full select-none">
           <button
             onClick={() => onChangeView('overview')}
-            className={`px-3 py-1 text-xs font-bold rounded-sm whitespace-nowrap shrink-0 transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
               activeView === 'overview' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
             }`}
           >
@@ -175,27 +175,27 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
           <button
             onClick={() => onChangeView('workouts')}
-            className={`px-3 py-1 text-xs font-bold rounded-sm whitespace-nowrap shrink-0 transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
               activeView === 'workouts' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
             }`}
           >
-            Workouts ({activeDataset.workoutCount})
+            Workouts
           </button>
           <button
             onClick={() => onChangeView('exercises')}
-            className={`px-3 py-1 text-xs font-bold rounded-sm whitespace-nowrap shrink-0 transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
               activeView === 'exercises' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
             }`}
           >
-            Exercises & PRs
+            Exercises
           </button>
           <button
             onClick={() => onChangeView('muscles')}
-            className={`px-3 py-1 text-xs font-bold rounded-sm whitespace-nowrap shrink-0 transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
               activeView === 'muscles' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
             }`}
           >
-            Muscle Splits
+            Muscles
           </button>
         </div>
       )}

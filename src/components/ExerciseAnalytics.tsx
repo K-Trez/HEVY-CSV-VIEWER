@@ -100,7 +100,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
     };
   }, [currentExercise, metricMode, unit]);
 
-  // Handle smooth mouse movement across chart area
+  // Handle smooth mouse and touch movement across chart area
   const handleChartMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
     if (!chartData || chartData.coords.length === 0 || !chartSvgRef.current) return;
     const rect = chartSvgRef.current.getBoundingClientRect();
@@ -122,6 +122,26 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
     setActivePointIndex(closestIdx);
   };
 
+  const handleChartTouch = (e: React.TouchEvent<SVGSVGElement>) => {
+    if (!chartData || chartData.coords.length === 0 || !chartSvgRef.current || !e.touches[0]) return;
+    const rect = chartSvgRef.current.getBoundingClientRect();
+    const touchX = e.touches[0].clientX - rect.left;
+    const scaleX = 700 / rect.width;
+    const svgX = touchX * scaleX;
+
+    let closestIdx = 0;
+    let closestDist = Infinity;
+    chartData.coords.forEach((c, i) => {
+      const dist = Math.abs(c.x - svgX);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestIdx = i;
+      }
+    });
+
+    setActivePointIndex(closestIdx);
+  };
+
   const handleChartMouseLeave = () => {
     setActivePointIndex(null);
   };
@@ -129,9 +149,9 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
   const activeCoord = chartData && activePointIndex !== null ? chartData.coords[activePointIndex] : null;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
       {/* Left Column: Exercise Search & Directory */}
-      <div className="lg:col-span-4 bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm p-4 flex flex-col h-[340px] sm:h-[420px] lg:h-[700px]">
+      <div className="lg:col-span-4 bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm p-3.5 sm:p-4 flex flex-col h-[280px] sm:h-[380px] lg:h-[700px]">
         <div className="mb-3">
           <h2 className="text-sm font-bold text-[#F8FAFC] mb-2 flex items-center justify-between">
             <span>Exercise Library</span>
@@ -351,7 +371,10 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                     ref={chartSvgRef}
                     onMouseMove={handleChartMouseMove}
                     onMouseLeave={handleChartMouseLeave}
-                    className="w-full h-full overflow-visible cursor-crosshair select-none"
+                    onTouchStart={handleChartTouch}
+                    onTouchMove={handleChartTouch}
+                    onTouchEnd={handleChartMouseLeave}
+                    className="w-full h-full overflow-visible cursor-crosshair select-none touch-none"
                     viewBox="0 0 700 240"
                     preserveAspectRatio="none"
                   >
@@ -478,7 +501,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                     : 'bg-[#0F172A] text-white border-[#334155]'
                 }`}
                 style={{
-                  left: `${(activeCoord.x / 700) * 100}%`,
+                  left: `${Math.min(80, Math.max(20, (activeCoord.x / 700) * 100))}%`,
                   top: '60px',
                 }}
               >

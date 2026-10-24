@@ -34,7 +34,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
   return (
     <div className="grid grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4">
       {/* 1. Lifetime Volume */}
-      <div className="col-span-2 sm:col-span-1 lg:col-span-1 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
+      <div className="col-span-2 sm:col-span-1 lg:col-span-1 bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-xs font-semibold text-[#94A3B8]">Total Volume</span>
           <div className="w-7 h-7 rounded-lg bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center">
@@ -51,7 +51,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       </div>
 
       {/* 2. Total Workouts */}
-      <div className="bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
+      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-xs font-semibold text-[#94A3B8]">Workouts Logged</span>
           <div className="w-7 h-7 rounded-lg bg-[#0C4A6E]/40 text-[#38BDF8] flex items-center justify-center">
@@ -68,7 +68,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       </div>
 
       {/* 3. Total Sets & Reps */}
-      <div className="bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
+      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-xs font-semibold text-[#94A3B8]">Sets & Reps</span>
           <div className="w-7 h-7 rounded-lg bg-[#064E3B]/40 text-[#34D399] flex items-center justify-center">
@@ -87,7 +87,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       </div>
 
       {/* 4. Total Hours */}
-      <div className="bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
+      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-xs font-semibold text-[#94A3B8]">Gym Time</span>
           <div className="w-7 h-7 rounded-lg bg-[#312E81]/40 text-[#818CF8] flex items-center justify-center">
@@ -104,7 +104,7 @@ export const MetricCards: React.FC<MetricCardsProps> = ({
       </div>
 
       {/* 5. Personal Records (PRs) */}
-      <div className="col-span-2 sm:col-span-1 lg:col-span-1 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
+      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all">
         <div className="flex items-center justify-between gap-2 mb-2">
           <span className="text-xs font-semibold text-[#94A3B8]">Milestone PRs</span>
           <div className="w-7 h-7 rounded-lg bg-[#1E3A8A]/50 text-[#60A5FA] flex items-center justify-center">

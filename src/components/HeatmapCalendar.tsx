@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import { Workout, UnitPreference } from '../types/workout';
-import { Flame, Calendar } from 'lucide-react';
+import { Flame, Calendar, ChevronLeft, ChevronRight, ChevronsRight, Maximize2, Minimize2 } from 'lucide-react';
 
 interface HeatmapCalendarProps {
   workouts: Workout[];
@@ -183,15 +183,31 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
   };
 
   const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [isFitToScreen, setIsFitToScreen] = useState<boolean>(true);
+
+  const handleScroll = (distance: number) => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: distance, behavior: 'smooth' });
+    }
+  };
+
+  const scrollToQuarter = (quarter: 1 | 2 | 3 | 4) => {
+    if (scrollRef.current) {
+      // Q1: 0px, Q2: ~210px, Q3: ~420px, Q4: ~660px
+      const offsets = { 1: 0, 2: 210, 3: 420, 4: 660 };
+      scrollRef.current.scrollTo({ left: offsets[quarter], behavior: 'smooth' });
+    }
+  };
 
   return (
-    <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm relative space-y-4">
+    <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm relative space-y-3.5">
       {/* Top Header Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div>
           <div className="flex items-center gap-2">
             <Calendar className="w-4 h-4 text-[#38BDF8]" />
-            <h2 className="text-base font-bold text-[#F8FAFC]">
+            <h2 className="text-sm sm:text-base font-bold text-[#F8FAFC]">
               Workout Activity & Consistency
             </h2>
           </div>
@@ -202,12 +218,26 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           </div>
         </div>
 
-        {/* Tab Controls & Overall Streak (more square-y buttons with micro-interactions) */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
+        {/* Tab Controls, Streak, Shrink to Fit Toggle, & Year Selectors */}
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          {/* Shrink to Fit Toggle Button */}
+          <button
+            onClick={() => setIsFitToScreen(!isFitToScreen)}
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
+              isFitToScreen
+                ? 'bg-[#2563EB] text-white shadow-sm'
+                : 'text-[#94A3B8] hover:text-[#F8FAFC] bg-[#0B0F17] border border-[#1E293B]'
+            }`}
+            title={isFitToScreen ? "Shrink to Fit is ON (entire table fits screen). Click for Scroll mode." : "Switch to Shrink to Fit"}
+          >
+            {isFitToScreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+            <span>{isFitToScreen ? 'Shrink to Fit' : 'Scrollable'}</span>
+          </button>
+
+          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold overflow-x-auto max-w-full">
             <button
               onClick={() => setSelectedTab('all')}
-              className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+              className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
                 selectedTab === 'all'
                   ? 'bg-[#2563EB] text-white shadow-sm'
                   : 'text-[#94A3B8] hover:text-[#F8FAFC]'
@@ -219,7 +249,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
               <button
                 key={yr}
                 onClick={() => setSelectedTab(yr.toString())}
-                className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+                className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
                   selectedTab === yr.toString()
                     ? 'bg-[#2563EB] text-white shadow-sm'
                     : 'text-[#94A3B8] hover:text-[#F8FAFC]'
@@ -230,76 +260,159 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-[#1E3A8A]/30 text-[#60A5FA] rounded-md border border-[#2563EB]/40 font-semibold text-xs">
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-[#1E3A8A]/30 text-[#60A5FA] rounded-md border border-[#2563EB]/40 font-semibold text-xs shrink-0">
             <Flame className="w-3.5 h-3.5 text-[#38BDF8] fill-[#38BDF8]" />
             <span>Best Streak: {totalStreakWeeks} wks</span>
           </div>
         </div>
       </div>
 
-      {/* Unified Joined Calendar Container: Single scrollbox synchronizing all years */}
-      <div className="overflow-x-auto pb-3 pt-1">
-        <div className="min-w-fit">
-          {/* Shared Standardized Month Labels across the top */}
-          <div className="flex text-[11px] font-semibold text-[#64748B] mb-2 pl-24 relative h-4 select-none">
-            {masterMonthLabels.map((item, idx) => (
-              <div
-                key={idx}
-                className="absolute whitespace-nowrap"
-                style={{ left: `${item.weekIndex * 15.5 + 96}px` }}
-              >
-                {item.label}
-              </div>
-            ))}
+      {/* Quarter Quick-Jump & Horizontal Scroll Buttons Bar (only visible when in scroll mode) */}
+      {!isFitToScreen && (
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#1E293B]/60 text-xs">
+          <div className="flex items-center gap-1 text-[11px] text-[#94A3B8] flex-wrap">
+            <span className="font-semibold text-[#64748B] mr-1">Timeline Jump:</span>
+            <button
+              onClick={() => scrollToQuarter(1)}
+              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+            >
+              Jan–Mar
+            </button>
+            <button
+              onClick={() => scrollToQuarter(2)}
+              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+            >
+              Apr–Jun
+            </button>
+            <button
+              onClick={() => scrollToQuarter(3)}
+              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+            >
+              Jul–Sep
+            </button>
+            <button
+              onClick={() => scrollToQuarter(4)}
+              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+            >
+              Oct–Dec
+            </button>
           </div>
 
+          {/* Scroll Left / Right Buttons */}
+          <div className="flex items-center gap-1 ml-auto">
+            <button
+              onClick={() => handleScroll(-240)}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] rounded-md border border-[#1E293B] transition-all active:scale-95 shadow-sm"
+              title="Scroll earlier months (Left)"
+              aria-label="Scroll earlier months"
+            >
+              <ChevronLeft className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <span className="text-[11px]">Scroll Left</span>
+            </button>
+            <button
+              onClick={() => handleScroll(240)}
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] rounded-md border border-[#1E293B] transition-all active:scale-95 shadow-sm"
+              title="Scroll later months (Right)"
+              aria-label="Scroll later months"
+            >
+              <span className="text-[11px]">Scroll Right</span>
+              <ChevronRight className="w-3.5 h-3.5 text-[#38BDF8]" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Unified Joined Calendar Container (Selector 1: shrinks to fit screen cleanly with zero wasted space) */}
+      <div
+        ref={scrollRef}
+        className={
+          isFitToScreen
+            ? "w-full overflow-hidden rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-2.5"
+            : "overflow-x-auto pb-3 pt-2 touch-pan-x w-full custom-scrollbar rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-2.5 scroll-smooth"
+        }
+      >
+        <div className={isFitToScreen ? "w-full select-none" : "w-max min-w-[980px] select-none"}>
+          {/* Shared Standardized Month Labels across the top */}
+          {isFitToScreen ? (
+            <div className="flex items-center gap-1 sm:gap-1.5 mb-1 text-[8px] sm:text-[9px] font-semibold text-[#64748B] select-none">
+              <div className="w-9 sm:w-11 shrink-0" />
+              <div className="w-2 shrink-0" />
+              <div className="flex-1 relative h-3 select-none">
+                {masterMonthLabels.map((item, idx) => (
+                  <div
+                    key={idx}
+                    className="absolute whitespace-nowrap font-bold"
+                    style={{ left: `${(item.weekIndex / 53) * 100}%` }}
+                  >
+                    {item.label}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="flex text-[11px] font-semibold text-[#64748B] mb-1.5 relative h-3.5 select-none">
+              {masterMonthLabels.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="absolute whitespace-nowrap font-bold"
+                  style={{ left: `${item.weekIndex * 16 + 116}px` }}
+                >
+                  {item.label}
+                </div>
+              ))}
+            </div>
+          )}
+
           {/* Joined Year Charts (Stacked seamlessly with matching week columns) */}
-          <div className="space-y-3">
+          <div className="space-y-1.5 sm:space-y-2">
             {displayedYears.map((yearData, yIdx) => {
               const volDisplay = unit === 'kg' ? yearData.volumeKg : yearData.volumeLbs;
 
               return (
                 <div
                   key={yearData.year}
-                  className={`flex items-center gap-3 ${
-                    yIdx > 0 ? 'pt-3 border-t border-[#1E293B]/40' : ''
+                  className={`flex items-center gap-1 sm:gap-1.5 ${
+                    yIdx > 0 ? 'pt-1.5 sm:pt-2 border-t border-[#1E293B]/30' : ''
                   }`}
                 >
-                  {/* Left Column: Year Badge & Stats */}
-                  <div className="w-20 shrink-0 text-left pr-2">
-                    <span className="text-sm font-bold text-[#F8FAFC] tracking-tight block">
+                  {/* Left Column: Shrunk Year Badge & Stats */}
+                  <div className="w-9 sm:w-11 shrink-0 text-left pr-0.5">
+                    <span className="text-[11px] sm:text-xs font-bold text-[#F8FAFC] tracking-tighter block leading-none">
                       {yearData.year}
                     </span>
-                    <span className="text-[10px] text-[#38BDF8] font-mono block leading-tight mt-0.5">
-                      {yearData.workoutCount} w/o
+                    <span className="text-[8px] sm:text-[9px] text-[#38BDF8] font-mono block leading-none mt-0.5">
+                      {yearData.workoutCount}w
                     </span>
-                    <span className="text-[10px] text-[#64748B] font-mono block truncate">
+                    <span className="text-[7px] sm:text-[8px] text-[#64748B] font-mono block truncate leading-none mt-0.5">
                       {volDisplay.toLocaleString()} {unit}
                     </span>
                   </div>
 
                   {/* Day of week labels */}
-                  <div className="flex flex-col gap-1 text-[10px] font-semibold text-[#64748B] pr-1.5 justify-between py-0.5 select-none shrink-0">
+                  <div className="flex flex-col gap-[1px] text-[7px] sm:text-[8px] font-semibold text-[#64748B] justify-between py-0.5 select-none shrink-0 w-2 text-center">
                     {dayNames.map((name, i) => (
-                      <span key={i} className="h-3 leading-3 text-center">
+                      <span key={i} className="leading-none text-center">
                         {i % 2 === 1 ? name : ''}
                       </span>
                     ))}
                   </div>
 
-                  {/* 52-53 Week Grid Columns */}
-                  <div className="flex gap-1 shrink-0">
+                  {/* 52-53 Week Grid Columns: Full width grid eliminating all dead/empty space */}
+                  <div className={isFitToScreen ? "flex-1 grid grid-cols-[repeat(53,minmax(0,1fr))] gap-[1px] sm:gap-[2px] min-w-0 items-center" : "flex gap-1 shrink-0"}>
                     {yearData.weeks.map((week, wIdx) => (
-                      <div key={wIdx} className="flex flex-col gap-1 shrink-0">
+                      <div key={wIdx} className={isFitToScreen ? "flex flex-col gap-[1px] sm:gap-[2px] min-w-0" : "flex flex-col gap-1 shrink-0"}>
                         {week.map((day, dIdx) => {
-                          const dayVolumeKg = day.workouts.reduce((acc, w) => acc + w.totalVolumeKg, 0);
                           const hasWorkout = day.workouts.length > 0;
 
                           if (!day.isInYear) {
                             return (
                               <div
                                 key={dIdx}
-                                className="w-3 h-3 rounded-[2.5px] opacity-10 bg-[#1E293B]/20"
+                                className={
+                                  isFitToScreen
+                                    ? "w-full aspect-square rounded-[1px] sm:rounded-[2px] opacity-10 bg-[#1E293B]/20"
+                                    : "w-3 h-3 rounded-[2.5px] opacity-10 bg-[#1E293B]/20"
+                                }
                               />
                             );
                           }
@@ -322,7 +435,11 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
                                 });
                               }}
                               onMouseLeave={() => setHoveredDay(null)}
-                              className={`w-3 h-3 rounded-[2.5px] border cursor-pointer outline-none transition-colors ${
+                              className={`${
+                                isFitToScreen
+                                  ? "w-full aspect-square rounded-[1px] sm:rounded-[2px]"
+                                  : "w-3 h-3 rounded-[2.5px]"
+                              } border cursor-pointer outline-none transition-colors touch-manipulation ${
                                 hasWorkout
                                   ? 'hover:ring-2 hover:ring-[#2ba2fb] hover:ring-offset-1 hover:ring-offset-[#131D31]'
                                   : 'cursor-default'
@@ -342,32 +459,29 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
       </div>
 
       {/* Bottom Legend */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-[#94A3B8] pt-2.5 border-t border-[#1E293B] gap-2">
-        <div className="flex items-center gap-4 text-[11px] flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <span className={`w-3 h-3 rounded-[2px] ${theme === 'light' ? 'bg-[#E2E8F0] border border-[#CBD5E1]' : 'bg-[#1E293B]/70 border border-[#334155]/50'}`} title="0 workouts (Rest)"></span>
-            <span>Rest day</span>
-          </div>
-          <div className="flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-[2px] bg-[#2ba2fb] border border-[#1d8de0] shadow-[0_0_5px_rgba(43,162,251,0.5)]" title="Workout logged"></span>
-            <span className="font-semibold text-[#F8FAFC]">Workout logged</span>
-          </div>
+      <div className="flex items-center gap-4 text-[11px] flex-wrap pt-2.5 border-t border-[#1E293B] text-[#94A3B8]">
+        <div className="flex items-center gap-1.5">
+          <span className={`w-3 h-3 rounded-[2px] ${theme === 'light' ? 'bg-[#E2E8F0] border border-[#CBD5E1]' : 'bg-[#1E293B]/70 border border-[#334155]/50'}`} title="0 workouts (Rest)"></span>
+          <span>Rest day</span>
         </div>
-
-        <div className="text-[11px] text-[#64748B]">
-          Click any active square to inspect workout
+        <div className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[2px] bg-[#2ba2fb] border border-[#1d8de0] shadow-[0_0_5px_rgba(43,162,251,0.5)]" title="Workout logged"></span>
+          <span className="font-semibold text-[#F8FAFC]">Workout logged</span>
         </div>
       </div>
 
       {/* Floating Hover Tooltip */}
       {hoveredDay && (
         <div
-          className={`fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] animate-in fade-in ${
+          className={`fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] max-w-[calc(100vw-32px)] animate-in fade-in ${
             theme === 'light'
               ? 'bg-[#FAF6F0] text-[#2D2117] border-[#DAC6B2] shadow-[0_10px_25px_-5px_rgba(110,90,75,0.2)]'
               : 'bg-[#0F172A] text-white border-[#334155]'
           }`}
-          style={{ left: `${hoveredDay.x}px`, top: `${hoveredDay.y}px` }}
+          style={{
+            left: `${typeof window !== 'undefined' ? Math.max(105, Math.min(window.innerWidth - 105, hoveredDay.x)) : hoveredDay.x}px`,
+            top: `${hoveredDay.y}px`
+          }}
         >
           <div className="font-semibold text-[11px] text-[#94A3B8]">
             {new Date(hoveredDay.dateStr).toLocaleDateString('en-US', {

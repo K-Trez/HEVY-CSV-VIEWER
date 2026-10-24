@@ -88,14 +88,14 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
         </div>
 
         {/* Filters Group */}
-        <div className="flex items-center gap-2 flex-wrap">
+        <div className="flex items-center gap-2 flex-wrap w-full md:w-auto justify-between sm:justify-start">
           {/* Routine filter */}
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-1.5 text-xs flex-1 sm:flex-initial min-w-[120px]">
             <Filter className="w-3.5 h-3.5 text-[#64748B] hidden sm:inline" />
             <select
               value={routineFilter}
               onChange={e => setRoutineFilter(e.target.value)}
-              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
             >
               <option value="all">All Routines ({workouts.length})</option>
               {uniqueRoutines.map(r => (
@@ -107,12 +107,12 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
           </div>
 
           {/* Sort selector */}
-          <div className="flex items-center gap-1.5 text-xs">
+          <div className="flex items-center gap-1.5 text-xs flex-1 sm:flex-initial min-w-[110px]">
             <ArrowUpDown className="w-3.5 h-3.5 text-[#64748B] hidden sm:inline" />
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as any)}
-              className="px-3 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
             >
               <option value="date-desc">Newest First</option>
               <option value="date-asc">Oldest First</option>
@@ -121,7 +121,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
           </div>
 
           {/* Expand/Collapse Toggle: square-y buttons */}
-          <div className="flex items-center gap-1 border-l border-[#1E293B] pl-2 text-xs">
+          <div className="flex items-center gap-1 border-l border-[#1E293B] pl-2 text-xs shrink-0">
             <button
               onClick={expandAll}
               className="px-2.5 py-1 text-xs font-bold text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
@@ -182,7 +182,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                 {/* Workout Card Header */}
                 <div
                   onClick={() => toggleExpand(workout.id)}
-                  className="p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-[#1E293B]/40 transition-colors"
+                  className="p-3.5 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-[#1E293B]/40 transition-colors"
                 >
                   <div className="flex items-start gap-3.5">
                     <div className="w-10 h-10 rounded-xl bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center shrink-0 mt-0.5">

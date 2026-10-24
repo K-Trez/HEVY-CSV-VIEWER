@@ -167,7 +167,7 @@ export default function App() {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 ${
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 overflow-x-hidden ${
       theme === 'dark'
         ? 'theme-dark bg-[#0B0F17] text-[#F1F5F9]'
         : 'theme-light bg-[#F5ECE1] text-[#2D2117]'
@@ -186,7 +186,7 @@ export default function App() {
       />
 
       {/* Main Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-8 py-6 space-y-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 md:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
         {/* If NO data is loaded: Landing / Upload Dropzone Screen */}
         {!parsedData && (
           <div className="max-w-2xl mx-auto py-12 space-y-6 animate-in fade-in">
@@ -337,9 +337,9 @@ export default function App() {
                 />
 
                 {/* Split Row: Recent Workouts & Key Milestones */}
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                   {/* Left Column: Recent Workouts preview */}
-                  <div className="lg:col-span-7 bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
+                  <div className="lg:col-span-7 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div>
@@ -370,13 +370,13 @@ export default function App() {
                               onClick={() => setSelectedWorkoutForModal(w)}
                               className="py-3 flex items-center justify-between gap-3 hover:bg-[#1E293B]/40 px-2.5 rounded-md cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
                             >
-                              <div>
-                                <div className="font-bold text-xs sm:text-sm text-[#F8FAFC]">
+                              <div className="min-w-0 pr-1">
+                                <div className="font-bold text-xs sm:text-sm text-[#F8FAFC] truncate">
                                   {w.title}
                                 </div>
-                                <div className="text-[11px] text-[#94A3B8] mt-0.5">
+                                <div className="text-[11px] text-[#94A3B8] mt-0.5 truncate">
                                   {w.startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
-                                  {' · '}{w.durationMinutes} min · {w.exercises.length} exercises
+                                  {' · '}{w.durationMinutes} min · {w.exercises.length} exs
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
@@ -404,7 +404,7 @@ export default function App() {
                   </div>
 
                   {/* Right Column: Top Exercises & PR Hall */}
-                  <div className="lg:col-span-5 bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
+                  <div className="lg:col-span-5 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div>

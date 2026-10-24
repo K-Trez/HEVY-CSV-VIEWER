@@ -118,41 +118,41 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
         </div>
 
         {/* 3 Zone Labels */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-4 mt-3 text-center">
-          <div className="bg-[#0B0F17] p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-xs font-bold text-[#60A5FA] flex items-center justify-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#3B82F6]" />
-              Push: {analytics.pushPct}%
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-4 mt-3 text-center">
+          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
+            <div className="text-[11px] sm:text-xs font-bold text-[#60A5FA] flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#3B82F6] shrink-0" />
+              <span>Push: {analytics.pushPct}%</span>
             </div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
-              {analytics.pushSets} sets (Chest, OHP, Tri)
-            </div>
-          </div>
-
-          <div className="bg-[#0B0F17] p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-xs font-bold text-[#34D399] flex items-center justify-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#10B981]" />
-              Pull: {analytics.pullPct}%
-            </div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
-              {analytics.pullSets} sets (Back, Rows, Bi)
+            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+              {analytics.pushSets} sets <span className="hidden sm:inline">(Chest, OHP, Tri)</span>
             </div>
           </div>
 
-          <div className="bg-[#0B0F17] p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-xs font-bold text-[#A5B4FC] flex items-center justify-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-[#818CF8]" />
-              Legs: {analytics.legsPct}%
+          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
+            <div className="text-[11px] sm:text-xs font-bold text-[#34D399] flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#10B981] shrink-0" />
+              <span>Pull: {analytics.pullPct}%</span>
             </div>
-            <div className="text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
-              {analytics.legsSets} sets (Quads, Hams, Calves)
+            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+              {analytics.pullSets} sets <span className="hidden sm:inline">(Back, Rows, Bi)</span>
+            </div>
+          </div>
+
+          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
+            <div className="text-[11px] sm:text-xs font-bold text-[#A5B4FC] flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#818CF8] shrink-0" />
+              <span>Legs: {analytics.legsPct}%</span>
+            </div>
+            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+              {analytics.legsSets} sets <span className="hidden sm:inline">(Quads, Hams, Calves)</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Muscle By Muscle Detailed Bars */}
-      <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm">
+      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm">
         <h3 className="text-sm font-bold text-[#F8FAFC] mb-1 flex items-center gap-2">
           <PieChart className="w-4 h-4 text-[#38BDF8]" />
           Target Muscle Group Distribution
