@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import { ExerciseStats, UnitPreference, MuscleGroup } from '../types/workout';
 import { MUSCLE_COLORS } from '../utils/muscleTaxonomy';
-import { Search, Trophy, TrendingUp, Calendar } from 'lucide-react';
+import { Search, Trophy, TrendingUp, Calendar, ChevronDown } from 'lucide-react';
 
 interface ExerciseAnalyticsProps {
   exerciseStats: Record<string, ExerciseStats>;
@@ -29,6 +29,10 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedMuscle, setSelectedMuscle] = useState<string>('all');
+  const [isMuscleMenuOpen, setIsMuscleMenuOpen] = useState(false);
+  const muscleMenuRef = useRef<HTMLDivElement>(null);
+  const muscleTriggerRef = useRef<HTMLButtonElement>(null);
+  const muscleListRef = useRef<HTMLDivElement>(null);
   const [metricMode, setMetricMode] = useState<'1rm' | 'weight' | 'volume'>('1rm');
   
   // Single active point index for jitter-free crosshair tracking
@@ -40,6 +44,61 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
       setSelectedTitle(initialSelectedExercise);
     }
   }, [initialSelectedExercise, exerciseStats]);
+
+  React.useEffect(() => {
+    if (!isMuscleMenuOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (muscleMenuRef.current && !muscleMenuRef.current.contains(event.target as Node)) {
+        setIsMuscleMenuOpen(false);
+      }
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsMuscleMenuOpen(false);
+        muscleTriggerRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isMuscleMenuOpen]);
+
+  // Move focus into the listbox when it opens so arrow keys work immediately.
+  React.useEffect(() => {
+    if (!isMuscleMenuOpen) return;
+    const options = muscleListRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]');
+    if (!options?.length) return;
+    const selected = muscleListRef.current?.querySelector<HTMLButtonElement>('[aria-selected="true"]');
+    (selected ?? options[0]).focus();
+  }, [isMuscleMenuOpen]);
+
+  const handleMuscleMenuKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    const options = Array.from(
+      muscleListRef.current?.querySelectorAll<HTMLButtonElement>('[role="option"]') ?? []
+    );
+    if (options.length === 0) return;
+    const current = options.indexOf(document.activeElement as HTMLButtonElement);
+    let next: number | null = null;
+
+    if (event.key === 'ArrowDown') next = current < 0 ? 0 : (current + 1) % options.length;
+    else if (event.key === 'ArrowUp') next = current <= 0 ? options.length - 1 : current - 1;
+    else if (event.key === 'Home') next = 0;
+    else if (event.key === 'End') next = options.length - 1;
+    else if (event.key === 'Tab') {
+      setIsMuscleMenuOpen(false);
+      return;
+    }
+
+    if (next !== null) {
+      event.preventDefault();
+      options[next].focus();
+    }
+  };
 
   const availableMuscles = useMemo(() => {
     const set = new Set<string>();
@@ -151,52 +210,110 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5">
       {/* Left Column: Exercise Search & Directory */}
-      <div className="lg:col-span-4 bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm p-3.5 sm:p-4 flex flex-col h-[280px] sm:h-[380px] lg:h-[700px]">
+      <div className="lg:col-span-4 bg-surface rounded-xl border border-line shadow-sm p-3.5 sm:p-4 flex flex-col h-[280px] sm:h-[380px] lg:h-[700px]">
         <div className="mb-3">
-          <h2 className="text-sm font-bold text-[#F8FAFC] mb-2 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-chalk mb-2 flex items-center justify-between">
             <span>Exercise Library</span>
-            <span className="text-xs text-[#94A3B8] font-normal font-mono tabular-nums">
+            <span className="text-xs text-dust font-normal font-mono tabular-nums">
               {filteredExercises.length} items
             </span>
           </h2>
 
-          {/* Search box */}
-          <div className="relative mb-2">
-            <Search className="w-3.5 h-3.5 text-[#64748B] absolute left-3 top-1/2 -translate-y-1/2" />
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-              placeholder="Filter exercises..."
-              className="w-full pl-8 pr-3 py-1.5 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6] transition-colors"
-            />
-          </div>
+          {/* Search box + muscle filter */}
+          <div className="flex items-center gap-1.5 mb-2">
+            <div className="relative flex-1 min-w-0">
+              <Search className="w-3.5 h-3.5 text-ash absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                aria-label="Filter exercises by name"
+                placeholder="Filter exercises"
+                className="w-full pl-8 pr-2.5 py-1.5 text-xs bg-void border border-line rounded-lg text-chalk placeholder:text-ash focus:border-plate focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-plate transition-colors"
+              />
+            </div>
 
-          {/* Muscle filter pills: square-y */}
-          <div className="flex gap-1 overflow-x-auto pb-1 text-[11px] no-scrollbar">
-            <button
-              onClick={() => setSelectedMuscle('all')}
-              className={`px-2.5 py-1 rounded-sm font-bold whitespace-nowrap transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                selectedMuscle === 'all'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'bg-[#1E293B] text-[#94A3B8] hover:text-[#F8FAFC]'
-              }`}
-            >
-              All
-            </button>
-            {availableMuscles.map(m => (
+            <div ref={muscleMenuRef} className="relative shrink-0">
               <button
-                key={m}
-                onClick={() => setSelectedMuscle(m)}
-                className={`px-2.5 py-1 rounded-sm font-bold whitespace-nowrap transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                  selectedMuscle === m
-                    ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'bg-[#1E293B] text-[#94A3B8] hover:text-[#F8FAFC]'
+                ref={muscleTriggerRef}
+                type="button"
+                onClick={() => setIsMuscleMenuOpen(open => !open)}
+                onKeyDown={e => {
+                  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setIsMuscleMenuOpen(true);
+                  }
+                }}
+                aria-haspopup="listbox"
+                aria-expanded={isMuscleMenuOpen}
+                aria-controls="muscle-listbox"
+                aria-label={`Muscle filter: ${
+                  selectedMuscle === 'all' ? 'all muscles' : selectedMuscle
+                }`}
+                className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-raised text-chalk-2 border transition-colors duration-150 hover:border-line-strong ${
+                  isMuscleMenuOpen ? 'border-plate/60 text-chalk' : 'border-line'
                 }`}
               >
-                {m}
+                <span
+                  aria-hidden="true"
+                  className={`w-1.5 h-1.5 rounded-full ${
+                    selectedMuscle === 'all'
+                      ? 'bg-chalk-2'
+                      : MUSCLE_COLORS[selectedMuscle as keyof typeof MUSCLE_COLORS]?.bar ?? 'bg-chalk-2'
+                  }`}
+                />
+                <span className="truncate max-w-24">
+                  {selectedMuscle === 'all' ? 'All muscles' : selectedMuscle}
+                </span>
+                <ChevronDown
+                  className={`w-3 h-3 text-ash duration-150 ${
+                    isMuscleMenuOpen ? 'rotate-180' : ''
+                  }`}
+                />
               </button>
-            ))}
+
+              {isMuscleMenuOpen && (
+                <div
+                  id="muscle-listbox"
+                  ref={muscleListRef}
+                  role="listbox"
+                  tabIndex={-1}
+                  aria-label="Filter by muscle group"
+                  onKeyDown={handleMuscleMenuKeyDown}
+                  className="animate-menu-in absolute right-0 top-full mt-1 z-20 w-44 max-h-64 overflow-y-auto rounded-lg border border-line bg-surface shadow-xl p-1"
+                >
+                  {['all', ...availableMuscles].map(m => {
+                    const isActive = selectedMuscle === m;
+                    const dot =
+                      m === 'all'
+                        ? 'bg-chalk-2'
+                        : MUSCLE_COLORS[m as keyof typeof MUSCLE_COLORS]?.bar ?? 'bg-chalk-2';
+                    return (
+                      <button
+                        key={m}
+                        type="button"
+                        role="option"
+                        tabIndex={-1}
+                        aria-selected={isActive}
+                        onClick={() => {
+                          setSelectedMuscle(m);
+                          setIsMuscleMenuOpen(false);
+                          muscleTriggerRef.current?.focus();
+                        }}
+                        className={`w-full flex items-center gap-2 text-left px-2 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                          isActive
+                            ? 'bg-raised text-chalk'
+                            : 'text-dust hover:bg-raised hover:text-chalk'
+                        }`}
+                      >
+                        <span aria-hidden="true" className={`w-1.5 h-1.5 rounded-full shrink-0 ${dot}`} />
+                        <span className="truncate">{m === 'all' ? 'All muscles' : m}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -212,28 +329,28 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
               <button
                 key={ex.exerciseTitle}
                 onClick={() => setSelectedTitle(ex.exerciseTitle)}
-                className={`w-full text-left p-2.5 rounded-md transition-all duration-150 border flex items-center justify-between gap-2 hover:-translate-y-0.5 active:scale-[0.99] ${
+                className={`w-full text-left p-2.5 rounded-lg transition-colors duration-150 border flex items-center justify-between gap-2 active:scale-[0.99] ${
                   isSelected
-                    ? 'bg-[#1E3A8A]/40 border-[#3B82F6]/60 text-[#F8FAFC] shadow-sm'
-                    : 'bg-[#0B0F17]/40 border-transparent hover:bg-[#1E293B]/60 hover:border-[#1E293B]'
+                    ? 'bg-tint-plate/50 border-plate/50 text-chalk shadow-sm'
+                    : 'bg-void/40 border-transparent hover:bg-raised/60 hover:border-line'
                 }`}
               >
                 <div className="min-w-0">
-                  <div className="font-bold text-xs truncate text-[#F8FAFC]">
+                  <div className="font-semibold text-xs truncate text-chalk">
                     {ex.exerciseTitle}
                   </div>
-                  <div className="flex items-center gap-2 text-[10px] text-[#94A3B8] mt-0.5">
+                  <div className="flex items-center gap-2 text-[10px] text-dust mt-0.5">
                     <span className={`font-semibold ${muscleColor.text}`}>{ex.muscleGroup}</span>
-                    <span aria-hidden="true" className="text-[#475569]">·</span>
+                    <span aria-hidden="true" className="text-ash">·</span>
                     <span>{ex.totalSets} sets</span>
                   </div>
                 </div>
 
                 <div className="text-right shrink-0">
-                  <div className="text-xs font-extrabold text-[#F8FAFC] tabular-nums font-mono">
+                  <div className="text-xs font-semibold text-chalk tabular-nums font-mono">
                     {topWeight > 0 ? `${topWeight} ${unit}` : 'BW'}
                   </div>
-                  <div className="text-[10px] text-[#38BDF8] tabular-nums font-mono">
+                  <div className="text-[10px] text-plate tabular-nums font-mono">
                     1RM: {top1RM}
                   </div>
                 </div>
@@ -247,51 +364,51 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
       {currentExercise ? (
         <div className="lg:col-span-8 space-y-4">
           {/* Header Card */}
-          <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm">
+          <div className="bg-surface rounded-xl p-5 border border-line shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <div className="flex items-center gap-2">
-                  <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${MUSCLE_COLORS[currentExercise.muscleGroup].bg} ${MUSCLE_COLORS[currentExercise.muscleGroup].text} border ${MUSCLE_COLORS[currentExercise.muscleGroup].border}`}>
+                  <span className={`text-xs font-semibold px-2 py-0.5 rounded-lg ${MUSCLE_COLORS[currentExercise.muscleGroup].bg} ${MUSCLE_COLORS[currentExercise.muscleGroup].text} border ${MUSCLE_COLORS[currentExercise.muscleGroup].border}`}>
                     {currentExercise.muscleGroup}
                   </span>
                   {currentExercise.secondaryMuscle && (
-                    <span className="text-xs text-[#94A3B8]">
+                    <span className="text-xs text-dust">
                       + {currentExercise.secondaryMuscle}
                     </span>
                   )}
                 </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-[#F8FAFC] mt-1.5">
+                <h2 className="text-xl sm:text-2xl font-semibold text-chalk mt-1.5">
                   {currentExercise.exerciseTitle}
                 </h2>
-                <div className="text-xs text-[#94A3B8] mt-1 flex items-center gap-2">
+                <div className="text-xs text-dust mt-1 flex items-center gap-2">
                   <span>First logged: {currentExercise.firstPerformed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                  <span aria-hidden="true" className="text-[#475569]">·</span>
+                  <span aria-hidden="true" className="text-ash">·</span>
                   <span>Latest: {currentExercise.lastPerformed.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
               </div>
 
               {/* Rep Max Snapshot */}
-              <div className="bg-[#0B0F17] p-3 rounded-xl border border-[#1E293B] flex items-center gap-4">
+              <div className="bg-void p-3 rounded-lg border border-line flex items-center gap-4">
                 <div className="text-center">
-                  <div className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider">Top Weight</div>
-                  <div className="text-base font-extrabold text-[#F8FAFC] tabular-nums font-mono">
-                    {unit === 'kg' ? currentExercise.allTimeMaxWeightKg : currentExercise.allTimeMaxWeightLbs} <span className="text-xs font-normal text-[#94A3B8]">{unit}</span>
+                  <div className="text-[10px] font-semibold text-dust uppercase tracking-wider">Top Weight</div>
+                  <div className="text-base font-semibold text-chalk tabular-nums font-mono">
+                    {unit === 'kg' ? currentExercise.allTimeMaxWeightKg : currentExercise.allTimeMaxWeightLbs} <span className="text-xs font-normal text-dust">{unit}</span>
                   </div>
                 </div>
-                <div className="h-7 w-[1px] bg-[#1E293B]" />
+                <div className="h-7 w-[1px] bg-raised" />
                 <div className="text-center">
-                  <div className="text-[10px] font-semibold text-[#94A3B8] uppercase tracking-wider">Estimated 1RM</div>
-                  <div className="text-base font-extrabold text-[#38BDF8] tabular-nums font-mono">
-                    {unit === 'kg' ? currentExercise.allTimeEstimated1RMKg : currentExercise.allTimeEstimated1RMLbs} <span className="text-xs font-normal text-[#94A3B8]">{unit}</span>
+                  <div className="text-[10px] font-semibold text-dust uppercase tracking-wider">Estimated 1RM</div>
+                  <div className="text-base font-semibold text-plate tabular-nums font-mono">
+                    {unit === 'kg' ? currentExercise.allTimeEstimated1RMKg : currentExercise.allTimeEstimated1RMLbs} <span className="text-xs font-normal text-dust">{unit}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Rep Max Table */}
-            <div className="mt-4 pt-4 border-t border-[#1E293B]">
-              <div className="text-xs font-bold text-[#94A3B8] mb-2 flex items-center gap-1.5">
-                <Trophy className="w-3.5 h-3.5 text-[#38BDF8]" />
+            <div className="mt-4 pt-4 border-t border-line">
+              <div className="text-xs font-semibold text-dust mb-2 flex items-center gap-1.5">
+                <Trophy className="w-3.5 h-3.5 text-plate" />
                 All-Time Rep Max Records
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
@@ -302,18 +419,18 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                   { label: '8RM', rec: currentExercise.repMaxRecords.eightRM },
                   { label: '10RM', rec: currentExercise.repMaxRecords.tenRM },
                 ].map(({ label, rec }) => (
-                  <div key={label} className="bg-[#0B0F17] rounded-xl p-2.5 border border-[#1E293B] text-center">
-                    <div className="text-[10px] font-bold text-[#64748B]">{label}</div>
-                    <div className="text-sm font-extrabold text-[#F8FAFC] tabular-nums font-mono mt-0.5">
+                  <div key={label} className="bg-void rounded-lg p-2.5 border border-line text-center">
+                    <div className="text-[10px] font-semibold text-ash">{label}</div>
+                    <div className="text-sm font-semibold text-chalk tabular-nums font-mono mt-0.5">
                       {rec ? (unit === 'kg' ? rec.weightKg : rec.weightLbs) : '—'}{' '}
-                      {rec && <span className="text-[10px] font-normal text-[#94A3B8]">{unit}</span>}
+                      {rec && <span className="text-[10px] font-normal text-dust">{unit}</span>}
                     </div>
                     {rec ? (
-                      <div className="text-[10px] text-[#38BDF8] mt-0.5 truncate">
+                      <div className="text-[10px] text-plate mt-0.5 truncate">
                         {rec.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                       </div>
                     ) : (
-                      <div className="text-[10px] text-[#475569] mt-0.5">Not set</div>
+                      <div className="text-[10px] text-ash mt-0.5">Not set</div>
                     )}
                   </div>
                 ))}
@@ -322,40 +439,40 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
           </div>
 
           {/* Progression Graph Card */}
-          <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm relative">
+          <div className="bg-surface rounded-xl p-5 border border-line shadow-sm relative">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
               <div>
-                <h3 className="text-sm font-bold text-[#F8FAFC] flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-[#38BDF8]" />
+                <h3 className="text-sm font-semibold text-chalk flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4 text-plate" />
                   Progress Over Time
                 </h3>
-                <div className="text-xs text-[#94A3B8] mt-0.5">
+                <div className="text-xs text-dust mt-0.5">
                   Chronological progression across all {currentExercise.history.length} logged sessions
                 </div>
               </div>
 
               {/* Metric Mode Switcher: Square-y buttons */}
-              <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
+              <div className="flex items-center gap-1 bg-void p-0.5 rounded-lg border border-line text-xs font-semibold">
                 <button
                   onClick={() => setMetricMode('1rm')}
-                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                    metricMode === '1rm' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold transition-colors duration-150 ${
+                    metricMode === '1rm' ? 'bg-raised text-chalk shadow-sm' : 'text-dust hover:text-chalk'
                   }`}
                 >
                   Est. 1RM
                 </button>
                 <button
                   onClick={() => setMetricMode('weight')}
-                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                    metricMode === 'weight' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold transition-colors duration-150 ${
+                    metricMode === 'weight' ? 'bg-raised text-chalk shadow-sm' : 'text-dust hover:text-chalk'
                   }`}
                 >
                   Top Weight
                 </button>
                 <button
                   onClick={() => setMetricMode('volume')}
-                  className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                    metricMode === 'volume' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold transition-colors duration-150 ${
+                    metricMode === 'volume' ? 'bg-raised text-chalk shadow-sm' : 'text-dust hover:text-chalk'
                   }`}
                 >
                   Volume
@@ -380,8 +497,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                   >
                     <defs>
                       <linearGradient id="chartGradientBlue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor={theme === 'light' ? '#FB923C' : '#3B82F6'} stopOpacity="0.4" />
-                        <stop offset="100%" stopColor={theme === 'light' ? '#FB923C' : '#3B82F6'} stopOpacity="0.0" />
+                        <stop offset="0%" style={{ stopColor: 'var(--color-plate)' }} stopOpacity="0.34" />
+                        <stop offset="100%" style={{ stopColor: 'var(--color-plate)' }} stopOpacity="0.0" />
                       </linearGradient>
                     </defs>
 
@@ -391,8 +508,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                       const val = Math.round(chartData.yMin + pct * (chartData.yMax - chartData.yMin));
                       return (
                         <g key={idx}>
-                          <line x1="40" y1={y} x2="690" y2={y} stroke={theme === 'light' ? '#DAC6B2' : '#1E293B'} strokeDasharray="3 3" />
-                          <text x="35" y={y + 4} textAnchor="end" fontSize="10" fill={theme === 'light' ? '#9E8674' : '#64748B'} fontFamily="monospace">
+                          <line x1="40" y1={y} x2="690" y2={y} style={{ stroke: 'var(--color-line)' }} strokeDasharray="3 3" />
+                          <text x="35" y={y + 4} textAnchor="end" fontSize="10" fill="var(--color-ash)" fontFamily="monospace">
                             {val}
                           </text>
                         </g>
@@ -403,8 +520,8 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                     {(() => {
                       const coords = chartData.coords;
                       const n = coords.length;
-                      const strokeColor = theme === 'light' ? '#EA580C' : '#38BDF8';
-                      const dotBg = theme === 'light' ? '#FAF6F0' : '#0B0F17';
+                      const strokeColor = 'var(--color-plate)';
+                      const dotBg = 'var(--color-surface)';
 
                       if (n === 1) {
                         return (
@@ -459,7 +576,7 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                                 cy={activeCoord.y}
                                 r="6.5"
                                 fill={strokeColor}
-                                stroke="#FFFFFF"
+                                style={{ stroke: 'var(--color-surface)' }}
                                 strokeWidth="2.5"
                               />
                             </g>
@@ -481,13 +598,13 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                 </div>
 
                 {/* X-axis date range */}
-                <div className="flex justify-between text-[11px] text-[#64748B] mt-2 px-10">
+                <div className="flex justify-between text-[11px] text-ash mt-2 px-10">
                   <span>{chartData.points[0]?.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                   <span>{chartData.points[chartData.points.length - 1]?.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                 </div>
               </div>
             ) : (
-              <div className="h-48 flex items-center justify-center text-xs text-[#64748B]">
+              <div className="h-48 flex items-center justify-center text-xs text-ash">
                 Not enough history points to chart.
               </div>
             )}
@@ -495,17 +612,17 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
             {/* Stable Tooltip pinned to activeCoord: square-y and themed */}
             {activeCoord && (
               <div
-                className={`absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-full text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] ${
+                className={`absolute z-30 pointer-events-none -translate-x-1/2 -translate-y-full text-xs rounded-lg py-2 px-3 shadow-2xl border min-w-[190px] ${
                   theme === 'light'
-                    ? 'bg-[#FAF6F0] text-[#2D2117] border-[#DAC6B2] shadow-[0_10px_25px_-5px_rgba(110,90,75,0.2)]'
-                    : 'bg-[#0F172A] text-white border-[#334155]'
+                    ? 'bg-surface text-chalk border-line shadow-lg'
+                    : 'bg-raised text-white border-line-strong'
                 }`}
                 style={{
                   left: `${Math.min(80, Math.max(20, (activeCoord.x / 700) * 100))}%`,
                   top: '60px',
                 }}
               >
-                <div className="font-semibold text-[11px] text-[#94A3B8]">
+                <div className="font-semibold text-[11px] text-dust">
                   {activeCoord.pt.date.toLocaleDateString('en-US', {
                     weekday: 'short',
                     month: 'short',
@@ -513,13 +630,13 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
                     year: 'numeric',
                   })}
                 </div>
-                <div className="font-bold text-sm text-[#F8FAFC] mt-0.5 truncate">
+                <div className="font-semibold text-sm text-chalk mt-0.5 truncate">
                   {activeCoord.pt.workoutTitle}
                 </div>
-                <div className="text-[11px] text-[#38BDF8] font-mono tabular-nums font-semibold mt-1">
+                <div className="text-[11px] text-plate font-mono tabular-nums font-semibold mt-1">
                   {activeCoord.pt.weight} {unit} × {activeCoord.pt.reps} reps
                 </div>
-                <div className="text-[10px] text-[#94A3B8]">
+                <div className="text-[10px] text-dust">
                   Est. 1RM: {activeCoord.pt.val} {unit} · Session #{activeCoord.idx + 1} of {chartData?.points.length}
                 </div>
               </div>
@@ -527,25 +644,25 @@ export const ExerciseAnalytics: React.FC<ExerciseAnalyticsProps> = ({
           </div>
 
           {/* Session History Log Table */}
-          <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm">
-            <h3 className="text-sm font-bold text-[#F8FAFC] mb-3 flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-[#38BDF8]" />
+          <div className="bg-surface rounded-xl p-5 border border-line shadow-sm">
+            <h3 className="text-sm font-semibold text-chalk mb-3 flex items-center gap-2">
+              <Calendar className="w-4 h-4 text-plate" />
               Historical Sessions Log ({currentExercise.history.length} logged sessions)
             </h3>
-            <div className="divide-y divide-[#1E293B] max-h-64 overflow-y-auto">
+            <div className="divide-y divide-line max-h-64 overflow-y-auto">
               {[...currentExercise.history].reverse().map((h, i) => (
-                <div key={i} className="py-2.5 flex items-center justify-between text-xs hover:bg-[#1E293B]/40 px-2 rounded-lg transition-colors">
+                <div key={i} className="py-2.5 flex items-center justify-between text-xs hover:bg-raised/40 px-2 rounded-lg transition-colors">
                   <div>
-                    <div className="font-bold text-[#F8FAFC]">{h.workoutTitle}</div>
-                    <div className="text-[11px] text-[#94A3B8]">
+                    <div className="font-semibold text-chalk">{h.workoutTitle}</div>
+                    <div className="text-[11px] text-dust">
                       {h.date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-extrabold text-[#F8FAFC] tabular-nums font-mono">
+                    <div className="font-semibold text-chalk tabular-nums font-mono">
                       {unit === 'kg' ? h.bestWeightKg : h.bestWeightLbs} {unit} × {h.bestReps}
                     </div>
-                    <div className="text-[10px] text-[#38BDF8] tabular-nums font-mono">
+                    <div className="text-[10px] text-plate tabular-nums font-mono">
                       1RM: {unit === 'kg' ? h.estimated1RMKg : h.estimated1RMLbs} {unit} · {h.totalSets} sets
                     </div>
                   </div>

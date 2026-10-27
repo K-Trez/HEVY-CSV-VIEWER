@@ -220,33 +220,33 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
   const balanceInfo = useMemo(() => {
     const vals = radarData.map(d => (metricMode === 'sets' ? d.sets : d.volume));
     const mean = vals.reduce((a, b) => a + b, 0) / (vals.length || 1);
-    if (mean === 0) return { label: 'No Data', color: 'text-[#94A3B8]', bg: 'bg-[#1E293B] border-[#334155]' };
+    if (mean === 0) return { label: 'No Data', color: 'text-dust', bg: 'bg-raised border-line-strong' };
     const variance = vals.reduce((sum, v) => sum + Math.pow(v - mean, 2), 0) / vals.length;
     const stdDev = Math.sqrt(variance);
     const cv = stdDev / mean;
 
-    if (cv < 0.45) return { label: 'Well Balanced Split', color: 'text-[#34D399]', bg: 'bg-[#064E3B]/40 border-[#059669]/40' };
-    if (cv < 0.8) return { label: 'Targeted Focus Split', color: 'text-[#38BDF8]', bg: 'bg-[#0C4A6E]/40 border-[#0284C7]/40' };
-    return { label: 'Specialized Training', color: 'text-[#F59E0B]', bg: 'bg-[#78350F]/40 border-[#D97706]/40' };
+    if (cv < 0.45) return { label: 'Well Balanced Split', color: 'text-grn', bg: 'bg-tint-grn/40 border-grn/40' };
+    if (cv < 0.8) return { label: 'Targeted Focus Split', color: 'text-plate', bg: 'bg-tint-plate/60 border-plate/30' };
+    return { label: 'Specialized Training', color: 'text-plate', bg: 'bg-tint-plate/40 border-plate/40' };
   }, [radarData, metricMode]);
 
   const activeDim = hoveredIndex !== null ? radarData[hoveredIndex] : null;
 
   return (
-    <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm relative space-y-4">
+    <div className="bg-surface rounded-xl p-3.5 sm:p-5 border border-line shadow-sm relative space-y-4">
       {/* Header with Title and Mode Switcher */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-2">
-            <Radar className="w-4 h-4 text-[#2ba2fb]" />
-            <h3 className="text-sm sm:text-base font-bold text-[#F8FAFC]">
+            <Radar className="w-4 h-4 text-plate" />
+            <h3 className="text-sm sm:text-base font-semibold text-chalk">
               Muscle Balance Radar (10 Target Zones)
             </h3>
-            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md border ${balanceInfo.bg} ${balanceInfo.color}`}>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-lg border ${balanceInfo.bg} ${balanceInfo.color}`}>
               {balanceInfo.label}
             </span>
           </div>
-          <p className="text-xs text-[#94A3B8] mt-0.5">
+          <p className="text-xs text-dust mt-0.5">
             Radial 10-point spider chart across Chest, Back, Forearms, Biceps, Triceps, Core, Quads, Hams, Glutes, and Calves
           </p>
         </div>
@@ -255,13 +255,13 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
         <div className="flex items-center gap-2 flex-wrap self-start sm:self-auto">
 
           {/* Metric Toggle: Sets vs Volume */}
-          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold">
+          <div className="flex items-center gap-1 bg-void p-0.5 rounded-lg border border-line text-xs font-semibold">
             <button
               onClick={() => setMetricMode('sets')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-[4px] transition-colors duration-150 ${
                 metricMode === 'sets'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  ? 'bg-raised text-chalk shadow-sm'
+                  : 'text-dust hover:text-chalk'
               }`}
             >
               <Layers className="w-3 h-3" />
@@ -269,10 +269,10 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
             </button>
             <button
               onClick={() => setMetricMode('volume')}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
+              className={`flex items-center gap-1 px-2.5 py-1 rounded-[4px] transition-colors duration-150 ${
                 metricMode === 'volume'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  ? 'bg-raised text-chalk shadow-sm'
+                  : 'text-dust hover:text-chalk'
               }`}
             >
               <Weight className="w-3 h-3" />
@@ -286,21 +286,21 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-center">
           {/* Left Column: Responsive SVG 10-pointed Spider Chart (shrinks to fit screen) */}
           <div className="lg:col-span-7 flex flex-col items-center justify-center relative w-full">
-            <div className="w-full rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-3 flex flex-col items-center justify-center">
+            <div className="w-full rounded-lg border border-line/70 bg-void/40 p-2 sm:p-3 flex flex-col items-center justify-center">
               <div className="w-full max-w-[440px] mx-auto flex flex-col items-center">
                 <svg
                   viewBox={`0 0 ${width} ${height}`}
-                  className="w-full max-w-[440px] h-auto aspect-[440/395] select-none drop-shadow-md mx-auto transition-all"
+                  className="w-full max-w-[440px] h-auto aspect-[440/395] select-none drop-shadow-md mx-auto transition-colors"
                 >
             <defs>
               {/* Radial gradient for data web polygon */}
               <radialGradient id="radarGlow10" cx="50%" cy="50%" r="50%">
-                <stop offset="0%" stopColor="#2ba2fb" stopOpacity="0.5" />
-                <stop offset="60%" stopColor="#2563EB" stopOpacity="0.25" />
-                <stop offset="100%" stopColor="#1E3A8A" stopOpacity="0.08" />
+                <stop offset="0%" style={{ stopColor: 'var(--color-plate)' }} stopOpacity="0.42" />
+                <stop offset="60%" style={{ stopColor: 'var(--color-plate)' }} stopOpacity="0.16" />
+                <stop offset="100%" style={{ stopColor: 'var(--color-plate)' }} stopOpacity="0.02" />
               </radialGradient>
               <filter id="vertexGlow10" x="-50%" y="-50%" width="200%" height="200%">
-                <feDropShadow dx="0" dy="0" stdDeviation="2.5" floodColor="#2ba2fb" floodOpacity="0.8" />
+                <feDropShadow dx="0" dy="0" stdDeviation="2.5" style={{ floodColor: 'var(--color-plate)' }} floodOpacity="0.8" />
               </filter>
             </defs>
 
@@ -317,18 +317,21 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                 <g key={`ring-${lIdx}`}>
                   <polygon
                     points={ringPoints}
-                    fill={lIdx === gridLevels.length - 1 ? 'rgba(30, 41, 59, 0.22)' : 'none'}
-                    stroke={theme === 'light' ? '#DAC6B2' : '#334155'}
+                    style={{
+                      fill: lIdx === gridLevels.length - 1 ? 'var(--color-raised)' : 'none',
+                      fillOpacity: lIdx === gridLevels.length - 1 ? 0.5 : 0,
+                      stroke: 'var(--color-line-strong)',
+                    }}
                     strokeWidth="1"
                     strokeDasharray={lIdx < gridLevels.length - 1 ? '3 3' : 'none'}
-                    opacity={theme === 'light' ? 0.75 : 0.65}
+                    opacity={0.7}
                   />
                   {/* Subtle level label at top vertex */}
                   <text
                     x={centerX}
                     y={centerY - radius * lvl + 9}
                     textAnchor="middle"
-                    className="text-[9px] fill-[#64748B] font-mono pointer-events-none"
+                    className="text-[9px] fill-ash font-mono pointer-events-none"
                   >
                     {Math.round(lvl * 100)}%
                   </text>
@@ -346,7 +349,7 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                   y1={centerY}
                   x2={edge.x}
                   y2={edge.y}
-                  stroke={theme === 'light' ? '#DAC6B2' : '#334155'}
+                  style={{ stroke: 'var(--color-line-strong)' }}
                   strokeWidth="1"
                   strokeOpacity="0.7"
                 />
@@ -357,10 +360,10 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
             <polygon
               points={polygonPathString}
               fill="url(#radarGlow10)"
-              stroke="#2ba2fb"
+              style={{ stroke: 'var(--color-plate)' }}
               strokeWidth="2.5"
               strokeLinejoin="round"
-              className="transition-all duration-300 ease-out"
+              className="transition-colors duration-300 ease-out"
             />
 
             {/* 4. Axis Labels for 10 dimensions with touch & hover hit-areas */}
@@ -392,12 +395,10 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                     x={lx}
                     y={ly + 4}
                     textAnchor={anchor}
-                    className={`text-[10px] sm:text-[11px] font-bold transition-all duration-150 ${
+                    className={`text-[10px] sm:text-[11px] font-semibold transition-colors duration-150 ${
                       isHovered
-                        ? 'fill-[#2ba2fb] font-extrabold'
-                        : theme === 'light'
-                        ? 'fill-[#2D2117]'
-                        : 'fill-[#E2E8F0]'
+                        ? 'fill-plate font-semibold'
+                        : 'fill-chalk-2'
                     }`}
                   >
                     {d.label}
@@ -429,7 +430,7 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                       cy={pt.y}
                       r="9"
                       fill="none"
-                      stroke="#2ba2fb"
+                      style={{ stroke: 'var(--color-plate)' }}
                       strokeWidth="2"
                       opacity="0.85"
                     />
@@ -440,11 +441,13 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                     cx={pt.x}
                     cy={pt.y}
                     r={isHovered ? 5.5 : 4}
-                    fill={isHovered ? '#FFFFFF' : '#2ba2fb'}
-                    stroke="#1E3A8A"
+                    style={{
+                      fill: isHovered ? 'var(--color-chalk)' : 'var(--color-plate)',
+                      stroke: 'var(--color-ply)',
+                    }}
                     strokeWidth="1.5"
                     filter={isHovered ? 'url(#vertexGlow10)' : undefined}
-                    className="transition-all duration-150"
+                    className="transition-colors duration-150"
                   />
                 </g>
               );
@@ -452,8 +455,8 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
           </svg>
 
                 {/* Quick Info Chip Under Radar */}
-                <div className="flex items-center gap-1.5 text-[11px] text-[#94A3B8] mt-2 text-center">
-                  <Sparkles className="w-3.5 h-3.5 text-[#2ba2fb] shrink-0" />
+                <div className="flex items-center gap-1.5 text-[11px] text-dust mt-2 text-center">
+                  <Sparkles className="w-3.5 h-3.5 text-plate shrink-0" />
                   <span>Hover or tap vertices to inspect volume & set shares</span>
                 </div>
               </div>
@@ -478,23 +481,23 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
                     key={dim.key}
                     onMouseEnter={() => setHoveredIndex(radarData.findIndex(r => r.key === dim.key))}
                     onMouseLeave={() => setHoveredIndex(null)}
-                    className={`p-2 rounded-lg border transition-all cursor-pointer ${
+                    className={`p-2 rounded-lg border transition-colors cursor-pointer ${
                       isHovered
-                        ? 'bg-[#1E293B]/80 border-[#2ba2fb] shadow-sm'
-                        : 'bg-[#0B0F17]/60 border-[#1E293B] hover:border-[#334155]'
+                        ? 'bg-raised/80 border-plate shadow-sm'
+                        : 'bg-void/60 border-line hover:border-line-strong'
                     }`}
                   >
                     <div className="flex items-center justify-between text-xs mb-1">
-                      <span className="font-semibold text-[#E2E8F0]">{dim.label}</span>
-                      <span className="font-mono text-[11px] text-[#2ba2fb] font-bold">
+                      <span className="font-semibold text-chalk-2">{dim.label}</span>
+                      <span className="font-mono text-[11px] text-plate font-semibold">
                         {val.toLocaleString()} {metricMode === 'sets' ? 'sets' : unit}{' '}
-                        <span className="text-[#94A3B8] font-normal">({pct}%)</span>
+                        <span className="text-dust font-normal">({pct}%)</span>
                       </span>
                     </div>
                     {/* Bar */}
-                    <div className="w-full bg-[#1E293B] rounded-full h-1.5 overflow-hidden">
+                    <div className="w-full bg-raised rounded-full h-1.5 overflow-hidden">
                       <div
-                        className="bg-gradient-to-r from-[#2563EB] to-[#2ba2fb] h-full rounded-full transition-all duration-300"
+                        className="bg-gradient-to-r from-ply to-plate h-full rounded-full transition-colors duration-300"
                         style={{ width: `${Math.min(pct * 2.5, 100)}%` }}
                       />
                     </div>

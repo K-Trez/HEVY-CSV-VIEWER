@@ -61,19 +61,27 @@ export function categorizeExercise(title: string): { primary: MuscleGroup; secon
   return { primary: 'Full Body' };
 }
 
-// Dark mode optimized color palette with electric blue, cyan, indigo, and emerald accents
+// Hue encodes movement pattern: push = accent blue, pull = violet, legs =
+// emerald, core = gold. Every group is also labelled in text, so colour is
+// never the only carrier of meaning.
+const PUSH = { bg: 'bg-tint-plate/60', text: 'text-plate', bar: 'bg-plate', border: 'border-plate/30' };
+const PULL = { bg: 'bg-tint-steel/60', text: 'text-steel', bar: 'bg-steel', border: 'border-steel/30' };
+const LEGS = { bg: 'bg-tint-grn/60', text: 'text-grn', bar: 'bg-grn', border: 'border-grn/30' };
+const CORE = { bg: 'bg-tint-gold/60', text: 'text-gold', bar: 'bg-gold', border: 'border-gold/30' };
+const MISC = { bg: 'bg-raised', text: 'text-chalk-2', bar: 'bg-ash', border: 'border-line' };
+
 export const MUSCLE_COLORS: Record<MuscleGroup, { bg: string; text: string; bar: string; border: string }> = {
-  Chest: { bg: 'bg-[#1E3A8A]/30', text: 'text-[#60A5FA]', bar: 'bg-[#3B82F6]', border: 'border-[#2563EB]/40' },
-  Back: { bg: 'bg-[#064E3B]/30', text: 'text-[#34D399]', bar: 'bg-[#10B981]', border: 'border-[#059669]/40' },
-  Shoulders: { bg: 'bg-[#1E293B]', text: 'text-[#38BDF8]', bar: 'bg-[#0EA5E9]', border: 'border-[#0284C7]/40' },
-  Quads: { bg: 'bg-[#312E81]/30', text: 'text-[#A5B4FC]', bar: 'bg-[#6366F1]', border: 'border-[#4F46E5]/40' },
-  Hamstrings: { bg: 'bg-[#4C1D95]/30', text: 'text-[#C084FC]', bar: 'bg-[#9333EA]', border: 'border-[#7E22CE]/40' },
-  Glutes: { bg: 'bg-[#831843]/30', text: 'text-[#F472B6]', bar: 'bg-[#EC4899]', border: 'border-[#DB2777]/40' },
-  Biceps: { bg: 'bg-[#0C4A6E]/30', text: 'text-[#38BDF8]', bar: 'bg-[#0284C7]', border: 'border-[#0369A1]/40' },
-  Triceps: { bg: 'bg-[#1E1B4B]/40', text: 'text-[#818CF8]', bar: 'bg-[#4F46E5]', border: 'border-[#3730A3]/40' },
-  Forearms: { bg: 'bg-[#0E7490]/30', text: 'text-[#22D3EE]', bar: 'bg-[#06B6D4]', border: 'border-[#0891B2]/40' },
-  Core: { bg: 'bg-[#14532D]/30', text: 'text-[#4ADE80]', bar: 'bg-[#22C55E]', border: 'border-[#16A34A]/40' },
-  Calves: { bg: 'bg-[#1E293B]/50', text: 'text-[#94A3B8]', bar: 'bg-[#64748B]', border: 'border-[#475569]/40' },
-  'Full Body': { bg: 'bg-[#1E293B]', text: 'text-[#CBD5E1]', bar: 'bg-[#3B82F6]', border: 'border-[#334155]' },
-  Cardio: { bg: 'bg-[#164E63]/30', text: 'text-[#2DD4BF]', bar: 'bg-[#14B8A6]', border: 'border-[#0D9488]/40' },
+  Chest: PUSH,
+  Shoulders: PUSH,
+  Triceps: PUSH,
+  Back: PULL,
+  Biceps: PULL,
+  Forearms: PULL,
+  Quads: LEGS,
+  Hamstrings: LEGS,
+  Glutes: LEGS,
+  Calves: LEGS,
+  Core: CORE,
+  'Full Body': MISC,
+  Cardio: MISC,
 };

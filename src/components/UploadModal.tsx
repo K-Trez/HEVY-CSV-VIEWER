@@ -24,6 +24,18 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   } | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const closeButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    closeButtonRef.current?.focus();
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const handleFileProcess = (file: File) => {
@@ -107,49 +119,66 @@ export const UploadModal: React.FC<UploadModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-[#0B0F17]/80 backdrop-blur-md animate-in fade-in">
-      <div className="bg-[#131D31] rounded-2xl sm:rounded-3xl max-w-xl w-full border border-[#1E293B] shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-in zoom-in-95">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-void/80 backdrop-blur-md animate-in fade-in">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upload-modal-title"
+        className="bg-surface rounded-xl max-w-xl w-full border border-line shadow-2xl overflow-hidden max-h-[92vh] flex flex-col animate-in zoom-in-95"
+      >
         {/* Modal Header */}
-        <div className="p-4 sm:p-6 border-b border-[#1E293B] flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b border-line flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-md bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center shrink-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-tint-steel/40 text-steel flex items-center justify-center shrink-0">
               <FileSpreadsheet className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="text-sm sm:text-base font-bold text-[#F8FAFC]">
+              <h3 id="upload-modal-title" className="text-sm sm:text-base font-semibold text-chalk">
                 Load Hevy Workout Data
               </h3>
-              <p className="text-xs text-[#94A3B8] mt-0.5">
+              <p className="text-xs text-dust mt-0.5">
                 Import your Hevy CSV export to view all your training history
               </p>
             </div>
           </div>
           <button
+            ref={closeButtonRef}
             onClick={onClose}
-            className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] hover:bg-[#1E293B] hover:text-[#F8FAFC] flex items-center justify-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B] shrink-0"
+            aria-label="Close upload dialog"
+            className="w-8 h-8 rounded-lg bg-void text-dust hover:bg-raised hover:text-chalk flex items-center justify-center transition-colors duration-150 border border-line shrink-0"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center border-b border-[#1E293B] px-4 sm:px-6 bg-[#0B0F17]/40 text-xs font-semibold">
+        <div
+          role="tablist"
+          aria-label="Import method"
+          className="flex items-center border-b border-line px-4 sm:px-6 bg-void/40 text-xs font-semibold"
+        >
           <button
+            role="tab"
+            aria-selected={activeTab === 'upload'}
+            aria-controls="upload-panel"
             onClick={() => setActiveTab('upload')}
             className={`py-3 px-3 border-b-2 transition-colors ${
               activeTab === 'upload'
-                ? 'border-[#3B82F6] text-[#38BDF8]'
-                : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
+                ? 'border-plate text-plate'
+                : 'border-transparent text-dust hover:text-chalk'
             }`}
           >
             Upload File
           </button>
           <button
+            role="tab"
+            aria-selected={activeTab === 'paste'}
+            aria-controls="paste-panel"
             onClick={() => setActiveTab('paste')}
             className={`py-3 px-3 border-b-2 transition-colors ${
               activeTab === 'paste'
-                ? 'border-[#3B82F6] text-[#38BDF8]'
-                : 'border-transparent text-[#94A3B8] hover:text-[#F8FAFC]'
+                ? 'border-plate text-plate'
+                : 'border-transparent text-dust hover:text-chalk'
             }`}
           >
             Paste Text
@@ -159,35 +188,35 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         {/* Content Body */}
         <div className="p-4 sm:p-6 overflow-y-auto flex-1">
           {errorMessage && (
-            <div className="mb-4 p-3 rounded-xl bg-[#7F1D1D]/30 border border-[#DC2626]/40 text-[#FCA5A5] text-xs flex items-center gap-2">
+            <div className="mb-4 p-3 rounded-lg bg-tint-ply/60 border border-danger/25 text-danger text-xs flex items-center gap-2">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{errorMessage}</span>
             </div>
           )}
 
           {activeTab === 'upload' && (
-            <div className="space-y-4">
+            <div role="tabpanel" id="upload-panel" className="space-y-4">
               {/* Drag and Drop Zone */}
               <div
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
-                className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all ${
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
                   dragActive
-                    ? 'border-[#3B82F6] bg-[#1E3A8A]/20'
-                    : 'border-[#1E293B] bg-[#0B0F17] hover:border-[#3B82F6]/60'
+                    ? 'border-plate bg-tint-plate/50'
+                    : 'border-line bg-void hover:border-plate/60'
                 }`}
               >
-                <UploadCloud className="w-10 h-10 text-[#38BDF8] mx-auto mb-3" />
-                <div className="text-sm font-bold text-[#F8FAFC]">
+                <UploadCloud className="w-10 h-10 text-plate mx-auto mb-3" />
+                <div className="text-sm font-semibold text-chalk">
                   Drag and drop your Hevy CSV file here
                 </div>
-                <div className="text-xs text-[#94A3B8] mt-1">
-                  Supports <code className="bg-[#1E293B] px-1.5 py-0.5 rounded text-[#38BDF8]">workout_data.csv</code>
+                <div className="text-xs text-dust mt-1">
+                  Supports <code className="bg-raised px-1.5 py-0.5 rounded text-plate">workout_data.csv</code>
                 </div>
 
                 <div className="mt-4">
-                  <label className="inline-block px-4 py-2 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md shadow-sm cursor-pointer transition-all duration-150 hover:-translate-y-0.5 active:scale-95">
+                  <label className="inline-block px-4 py-2 text-xs font-semibold text-white bg-ply hover:bg-ply-deep rounded-lg shadow-sm cursor-pointer transition-colors duration-150">
                     Browse Computer
                     <input
                       type="file"
@@ -205,21 +234,21 @@ export const UploadModal: React.FC<UploadModalProps> = ({
 
               {/* Ready Preview */}
               {previewData && (
-                <div className="p-4 rounded-xl bg-[#064E3B]/30 border border-[#059669]/40 flex items-center justify-between">
+                <div className="p-4 rounded-lg bg-tint-grn/30 border border-grn/40 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-md bg-[#10B981] text-white flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-lg bg-grn text-void flex items-center justify-center">
                       <Check className="w-4 h-4" />
                     </div>
                     <div>
-                      <div className="font-bold text-xs text-[#F8FAFC]">{previewData.filename}</div>
-                      <div className="text-[11px] text-[#34D399]">
+                      <div className="font-semibold text-xs text-chalk">{previewData.filename}</div>
+                      <div className="text-[11px] text-grn">
                         {previewData.workoutCount} workouts · {previewData.setCount} sets parsed successfully
                       </div>
                     </div>
                   </div>
                   <button
                     onClick={confirmPreviewLoad}
-                    className="px-4 py-2 text-xs font-bold text-white bg-[#10B981] hover:bg-[#059669] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shadow-sm"
+                    className="px-4 py-2 text-xs font-semibold text-void bg-grn hover:brightness-105 rounded-lg transition-colors duration-150 shadow-sm"
                   >
                     Load Data
                   </button>
@@ -227,25 +256,25 @@ export const UploadModal: React.FC<UploadModalProps> = ({
               )}
 
               {/* How to export guidance */}
-              <div className="bg-[#0B0F17] rounded-xl p-4 border border-[#1E293B] text-xs text-[#94A3B8]">
-                <div className="font-bold text-[#F8FAFC] flex items-center gap-1.5 mb-2">
-                  <Smartphone className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <div className="bg-void rounded-lg p-4 border border-line text-xs text-dust">
+                <div className="font-semibold text-chalk flex items-center gap-1.5 mb-2">
+                  <Smartphone className="w-3.5 h-3.5 text-plate" />
                   How to export from Hevy app:
                 </div>
                 <ol className="list-decimal pl-4 space-y-1 text-[11px]">
                   <li>Open the <strong>Hevy app</strong> on your phone.</li>
-                  <li>Go to <strong>Profile</strong> tab $\rightarrow$ Tap the <strong>Settings gear</strong> in the top right.</li>
+                  <li>Go to <strong>Profile</strong> tab → Tap the <strong>Settings gear</strong> in the top right.</li>
                   <li>Scroll down to <strong>Export Data</strong> and select CSV.</li>
-                  <li>Save or air-drop the downloaded <code className="bg-[#1E293B] px-1 rounded text-[#38BDF8]">workout_data.csv</code> here.</li>
+                  <li>Save or air-drop the downloaded <code className="bg-raised px-1 rounded text-plate">workout_data.csv</code> here.</li>
                 </ol>
               </div>
             </div>
           )}
 
           {activeTab === 'paste' && (
-            <div className="space-y-4">
+            <div role="tabpanel" id="paste-panel" className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-[#F8FAFC] mb-1.5">
+                <label className="block text-xs font-semibold text-chalk mb-1.5">
                   Paste raw CSV text:
                 </label>
                 <textarea
@@ -253,12 +282,12 @@ export const UploadModal: React.FC<UploadModalProps> = ({
                   onChange={(e) => setPastedCSV(e.target.value)}
                   placeholder="title,start_time,end_time,description,exercise_title,..."
                   rows={8}
-                  className="w-full p-3 text-xs font-mono bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#F8FAFC] focus:outline-none focus:border-[#3B82F6]"
+                  className="w-full p-3 text-xs font-mono bg-void border border-line rounded-lg text-chalk focus:outline-none focus:border-plate"
                 />
               </div>
               <button
                 onClick={handlePasteSubmit}
-                className="w-full py-2.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shadow-sm"
+                className="w-full py-2.5 text-xs font-semibold text-white bg-ply hover:bg-ply-deep rounded-lg transition-colors duration-150 shadow-sm"
               >
                 Parse and Load Workouts
               </button>
@@ -267,11 +296,11 @@ export const UploadModal: React.FC<UploadModalProps> = ({
         </div>
 
         {/* Modal Footer */}
-        <div className="p-4 bg-[#0B0F17]/60 border-t border-[#1E293B] flex items-center justify-between text-xs text-[#64748B]">
+        <div className="p-4 bg-void/60 border-t border-line flex items-center justify-between text-xs text-ash">
           <span>100% private & client-side only</span>
           <button
             onClick={onClose}
-            className="text-xs font-medium text-[#94A3B8] hover:text-[#F8FAFC]"
+            className="text-xs font-medium text-dust hover:text-chalk"
           >
             Cancel
           </button>

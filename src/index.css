@@ -1,215 +1,215 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   NEUTRAL SYSTEM — graphite and paper with one working accent.
+   Every surface token flips by lightness only; colour is spent on data.
+   ========================================================================== */
+
+@theme {
+  --color-void: #09090B;
+  --color-sunken: #0C0C0E;
+  --color-surface: #121215;
+  --color-raised: #1A1A1E;
+  --color-line: #26262B;
+  --color-line-strong: #3A3A41;
+
+  --color-chalk: #F7F7F8;
+  --color-chalk-2: #D3D3D9;
+  --color-dust: #A0A0AB;
+  --color-ash: #8C8C96;
+
+  --color-plate: #7AA2FF;      /* working accent — text, icons, focus */
+  --color-on-plate: #0A0F1F;   /* text on an accent-coloured fill */
+  --color-ply: #2F62E8;        /* filled primary action */
+  --color-ply-deep: #2551CC;
+  --color-ply-text: #8FB2FF;   /* accent at text weight */
+  --color-steel: #B49CFF;      /* violet — pull pattern, secondary data */
+  --color-grn: #4ADE80;        /* emerald — legs, positive */
+  --color-gold: #F0C24B;       /* PR / core */
+  --color-danger: #FF7A75;
+
+  --color-tint-plate: #15213A;
+  --color-tint-ply: #2A1717;
+  --color-tint-steel: #221C33;
+  --color-tint-grn: #12251A;
+  --color-tint-gold: #2A2110;
+
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.theme-light {
+  --color-void: #F6F7F9;
+  --color-sunken: #EDEFF2;
+  --color-surface: #FFFFFF;
+  --color-raised: #F1F2F4;
+  --color-line: #E3E5E9;
+  --color-line-strong: #CFD2D8;
+
+  --color-chalk: #16161A;
+  --color-chalk-2: #3C3C44;
+  --color-dust: #55555F;
+  --color-ash: #6A6A75;
+
+  --color-plate: #2557D6;
+  --color-on-plate: #FFFFFF;
+  --color-ply: #2557D6;
+  --color-ply-deep: #1D46B0;
+  --color-ply-text: #1D46B0;
+  --color-steel: #6B46C1;
+  --color-grn: #0F7A4F;
+  --color-gold: #8A5B00;
+  --color-danger: #B4231F;
+
+  --color-tint-plate: #E7ECFB;
+  --color-tint-ply: #FBE9E8;
+  --color-tint-steel: #EFEAFB;
+  --color-tint-grn: #E4F4EC;
+  --color-tint-gold: #F8EFD9;
+}
+
 @layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
   body {
-    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11" 1, "ss01" 1;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-plate);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, var(--color-plate) 26%, transparent);
+    color: var(--color-chalk);
   }
 }
 
-/* Animations & Micro-interactions */
-@keyframes fadeSlideUp {
+/* ---- Type roles ------------------------------------------------------- */
+
+/* Titles. Tight, quiet, sentence case. */
+.type-display {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+/* Micro labels above values. */
+.type-stamp {
+  font-family: var(--font-sans);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Every numeral in the app. Tabular so columns never shift. */
+.type-data {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+/* ---- Motion ----------------------------------------------------------- */
+
+@keyframes menuIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(-4px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
-@keyframes subtlePulse {
-  0%, 100% {
-    transform: scale(1);
+.animate-menu-in {
+  animation: menuIn 0.14s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+button,
+.btn-action {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
-  50% {
-    transform: scale(1.02);
-  }
 }
 
-.animate-fade-slide {
-  animation: fadeSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
+/* ---- Scrollbars ------------------------------------------------------- */
 
-/* Tactile square-y button micro-interactions */
-button, .btn-action {
-  transition: all 0.16s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-button:hover:not(:disabled) {
-  transform: translateY(-1px);
-}
-
-button:active:not(:disabled) {
-  transform: translateY(0.5px) scale(0.98);
-}
-
-/* Custom scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: rgba(15, 23, 42, 0.6);
-  border-radius: 4px;
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
-  border-radius: 4px;
+  background: var(--color-line-strong);
+  border-radius: 999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #38BDF8;
+  background: var(--color-ash);
 }
 
-/* Explicit high-visibility scrollbar for table/chart containers */
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: #2ba2fb #0B0F17;
+  scrollbar-color: var(--color-line-strong) transparent;
 }
 .custom-scrollbar::-webkit-scrollbar {
   height: 8px;
   width: 8px;
 }
 .custom-scrollbar::-webkit-scrollbar-track {
-  background: #0B0F17;
-  border-radius: 6px;
-  border: 1px solid #1E293B;
+  background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #2ba2fb;
-  border-radius: 6px;
+  background: var(--color-line-strong);
+  border-radius: 999px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #38BDF8;
+  background: var(--color-ash);
 }
 
-.theme-light .custom-scrollbar {
-  scrollbar-color: #EA580C #EDE0D1;
-}
-.theme-light .custom-scrollbar::-webkit-scrollbar-track {
-  background: #EDE0D1;
-  border: 1px solid #DAC6B2;
-}
-.theme-light .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #EA580C;
-}
+/* ---- Heatmap ---------------------------------------------------------- */
 
-/* ==========================================================================
-   LIGHT MODE: Pastel Orange with Tan
-   ========================================================================== */
-.theme-light {
-  background-color: #F5ECE1 !important;
-  color: #2D2117 !important;
-}
-
-.theme-light ::-webkit-scrollbar-thumb {
-  background: #DAC6B2;
-}
-.theme-light ::-webkit-scrollbar-thumb:hover {
-  background: #C4AE98;
-}
-
-/* Surfaces and borders in Light Mode */
-.theme-light header {
-  background-color: rgba(245, 236, 225, 0.95) !important;
-  border-color: #DECABE !important;
-}
-
-.theme-light .bg-\[\#0B0F17\] {
-  background-color: #EFE4D6 !important;
-}
-.theme-light .bg-\[\#0B0F17\]\/90 {
-  background-color: rgba(245, 236, 225, 0.95) !important;
-}
-.theme-light .bg-\[\#0B0F17\]\/40 {
-  background-color: rgba(239, 228, 214, 0.55) !important;
-}
-.theme-light .bg-\[\#131D31\] {
-  background-color: #FAF6F0 !important;
-  box-shadow: 0 1px 4px 0 rgba(110, 90, 75, 0.06), 0 2px 8px -2px rgba(110, 90, 75, 0.05);
-}
-.theme-light .bg-\[\#111A2E\] {
-  background-color: #EDE0D1 !important;
-}
-.theme-light .border-\[\#1E293B\] {
-  border-color: #DAC6B2 !important;
-}
-.theme-light .border-\[\#1E293B\]\/40 {
-  border-color: rgba(218, 198, 178, 0.45) !important;
-}
-.theme-light .divide-\[\#1E293B\] > :not([hidden]) ~ :not([hidden]) {
-  border-color: #DAC6B2 !important;
-}
-
-/* Typography in Light Mode */
-.theme-light .text-\[\#F8FAFC\],
-.theme-light .text-\[\#F1F5F9\],
-.theme-light .text-\[\#E2E8F0\],
-.theme-light .text-\[\#CBD5E1\] {
-  color: #2D2117 !important;
-}
-.theme-light .text-\[\#94A3B8\] {
-  color: #6E5A4B !important;
-}
-.theme-light .text-\[\#64748B\] {
-  color: #9B8674 !important;
-}
-.theme-light .placeholder-\[\#64748B\]::placeholder {
-  color: #9B8674 !important;
-}
-
-/* Accents in Light Mode: Vibrant & Pastel Orange */
-.theme-light .bg-\[\#2563EB\] {
-  background-color: #EA580C !important;
-}
-.theme-light .hover\:bg-\[\#1D4ED8\]:hover,
-.theme-light .hover\:bg-\[\#2563EB\]:hover {
-  background-color: #C2410C !important;
-}
-.theme-light .text-\[\#38BDF8\],
-.theme-light .text-\[\#60A5FA\] {
-  color: #EA580C !important;
-}
-.theme-light .border-\[\#38BDF8\],
-.theme-light .border-\[\#60A5FA\] {
-  border-color: #EA580C !important;
-}
-.theme-light .hover\:border-\[\#3B82F6\]\/40:hover,
-.theme-light .hover\:border-\[\#3B82F6\]\/50:hover,
-.theme-light .hover\:border-\[\#3B82F6\]\/60:hover {
-  border-color: #FB923C !important;
-}
-
-/* Tan & Peach Badge Insets */
-.theme-light .bg-\[\#1E3A8A\]\/40,
-.theme-light .bg-\[\#1E3A8A\]\/50,
-.theme-light .bg-\[\#0C4A6E\]\/40 {
-  background-color: #FFEDD5 !important;
-  color: #EA580C !important;
-}
-.theme-light .bg-\[\#1E3A8A\] {
-  background-color: #FED7AA !important;
-}
-.theme-light .hover\:bg-\[\#1E293B\]:hover {
-  background-color: #E5D5C4 !important;
-}
-.theme-light .hover\:bg-\[\#1E293B\]\/40:hover {
-  background-color: rgba(229, 213, 196, 0.45) !important;
-}
-.theme-light .hover\:bg-\[\#1E293B\]\/60:hover {
-  background-color: rgba(229, 213, 196, 0.65) !important;
-}
-
-/* Calendar heatmap cubes: strictly gray for rest and #2ba2fb for workout days */
 .heat-cube-0 {
-  background-color: #1E293B !important;
-  border-color: rgba(51, 65, 85, 0.6) !important;
+  background-color: var(--color-raised);
+  border-color: var(--color-line);
 }
-.theme-light .heat-cube-0 {
-  background-color: #E2E8F0 !important;
-  border-color: #CBD5E1 !important;
+
+.heat-cube-1 {
+  background-color: color-mix(in srgb, var(--color-plate) 24%, var(--color-raised));
+  border-color: color-mix(in srgb, var(--color-plate) 36%, var(--color-raised));
 }
-.heat-cube-workout {
-  background-color: #2ba2fb !important;
-  border-color: #1d8de0 !important;
+
+.heat-cube-2 {
+  background-color: color-mix(in srgb, var(--color-plate) 52%, var(--color-raised));
+  border-color: var(--color-plate);
+}
+
+.heat-cube-3 {
+  background-color: var(--color-plate);
+  border-color: var(--color-plate);
+}
+
+.heat-cube-4 {
+  background-color: var(--color-ply-deep);
+  border-color: var(--color-ply-deep);
 }

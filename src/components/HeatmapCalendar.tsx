@@ -172,14 +172,26 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
     return allYearsData[0]?.monthLabels || [];
   }, [allYearsData]);
 
-  // Heatmap intensity: strictly gray for rest, and ONLY #2ba2fb on days you worked out
-  const getHeatmapColor = (count: number) => {
-    if (count === 0) {
+  const maxDayVolumeKg = useMemo(() => {
+    let max = 0;
+    workoutDateMap.forEach(list => {
+      const volume = list.reduce((sum, w) => sum + w.totalVolumeKg, 0);
+      if (volume > max) max = volume;
+    });
+    return max || 1;
+  }, [workoutDateMap]);
+
+  // Rest days read as bare rack steel; training days darken with the volume moved.
+  const getHeatmapColor = (dayWorkouts: Workout[]) => {
+    if (dayWorkouts.length === 0) {
       return theme === 'light'
-        ? 'heat-cube-0 bg-[#E2E8F0] border-[#CBD5E1] hover:border-[#94A3B8]'
-        : 'heat-cube-0 bg-[#1E293B]/60 border-[#334155]/40 hover:border-[#64748B]';
+        ? 'heat-cube-0 bg-raised border-line hover:border-line-strong'
+        : 'heat-cube-0 bg-raised/60 border-line-strong/40 hover:border-line-strong';
     }
-    return 'heat-cube-workout bg-[#2ba2fb] border-[#1d8de0] hover:brightness-110 shadow-[0_0_5px_rgba(43,162,251,0.45)]';
+    const volume = dayWorkouts.reduce((sum, w) => sum + w.totalVolumeKg, 0);
+    const intensity = volume / maxDayVolumeKg;
+    const level = intensity < 0.3 ? 1 : intensity < 0.55 ? 2 : intensity < 0.8 ? 3 : 4;
+    return `heat-cube-${level} hover:brightness-110`;
   };
 
   const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
@@ -201,17 +213,17 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
   };
 
   return (
-    <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm relative space-y-3.5">
+    <div className="bg-surface rounded-xl p-3.5 sm:p-5 border border-line shadow-sm relative space-y-3.5">
       {/* Top Header Controls */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-[#38BDF8]" />
-            <h2 className="text-sm sm:text-base font-bold text-[#F8FAFC]">
+            <Calendar className="w-4 h-4 text-plate" />
+            <h2 className="text-sm sm:text-base font-semibold text-chalk">
               Workout Activity & Consistency
             </h2>
           </div>
-          <div className="text-xs text-[#94A3B8] mt-0.5">
+          <div className="text-xs text-dust mt-0.5">
             {selectedTab === 'all'
               ? `Unified All-Time Timeline · Continuous Jan–Dec Calendar`
               : `Calendar Year ${selectedTab} (Jan 1 – Dec 31)`}
@@ -223,10 +235,10 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           {/* Shrink to Fit Toggle Button */}
           <button
             onClick={() => setIsFitToScreen(!isFitToScreen)}
-            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold transition-colors duration-150 shrink-0 ${
               isFitToScreen
-                ? 'bg-[#2563EB] text-white shadow-sm'
-                : 'text-[#94A3B8] hover:text-[#F8FAFC] bg-[#0B0F17] border border-[#1E293B]'
+                ? 'bg-raised text-chalk border border-line-strong shadow-sm'
+                : 'text-dust hover:text-chalk bg-void border border-line'
             }`}
             title={isFitToScreen ? "Shrink to Fit is ON (entire table fits screen). Click for Scroll mode." : "Switch to Shrink to Fit"}
           >
@@ -234,13 +246,13 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
             <span>{isFitToScreen ? 'Shrink to Fit' : 'Scrollable'}</span>
           </button>
 
-          <div className="flex items-center gap-1 bg-[#0B0F17] p-0.5 rounded-md border border-[#1E293B] text-xs font-semibold overflow-x-auto max-w-full">
+          <div className="flex items-center gap-1 bg-void p-0.5 rounded-lg border border-line text-xs font-semibold overflow-x-auto max-w-full">
             <button
               onClick={() => setSelectedTab('all')}
-              className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
+              className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold transition-colors duration-150 shrink-0 ${
                 selectedTab === 'all'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                  ? 'bg-raised text-chalk shadow-sm'
+                  : 'text-dust hover:text-chalk'
               }`}
             >
               All Time
@@ -249,10 +261,10 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
               <button
                 key={yr}
                 onClick={() => setSelectedTab(yr.toString())}
-                className={`px-2.5 py-1 rounded-sm text-xs font-bold transition-all duration-150 hover:-translate-y-0.5 active:scale-95 shrink-0 ${
+                className={`px-2.5 py-1 rounded-[4px] text-xs font-semibold transition-colors duration-150 shrink-0 ${
                   selectedTab === yr.toString()
-                    ? 'bg-[#2563EB] text-white shadow-sm'
-                    : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+                    ? 'bg-raised text-chalk shadow-sm'
+                    : 'text-dust hover:text-chalk'
                 }`}
               >
                 {yr}
@@ -260,8 +272,8 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
             ))}
           </div>
 
-          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-[#1E3A8A]/30 text-[#60A5FA] rounded-md border border-[#2563EB]/40 font-semibold text-xs shrink-0">
-            <Flame className="w-3.5 h-3.5 text-[#38BDF8] fill-[#38BDF8]" />
+          <div className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1 bg-raised text-dust rounded-lg border border-line font-semibold text-xs shrink-0">
+            <Flame className="w-3.5 h-3.5 text-gold" />
             <span>Best Streak: {totalStreakWeeks} wks</span>
           </div>
         </div>
@@ -269,30 +281,30 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
 
       {/* Quarter Quick-Jump & Horizontal Scroll Buttons Bar (only visible when in scroll mode) */}
       {!isFitToScreen && (
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-[#1E293B]/60 text-xs">
-          <div className="flex items-center gap-1 text-[11px] text-[#94A3B8] flex-wrap">
-            <span className="font-semibold text-[#64748B] mr-1">Timeline Jump:</span>
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-line/60 text-xs">
+          <div className="flex items-center gap-1 text-[11px] text-dust flex-wrap">
+            <span className="font-semibold text-ash mr-1">Timeline Jump:</span>
             <button
               onClick={() => scrollToQuarter(1)}
-              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+              className="px-2 py-0.5 rounded bg-void hover:bg-raised hover:text-plate text-chalk-2 border border-line transition-colors"
             >
               Jan–Mar
             </button>
             <button
               onClick={() => scrollToQuarter(2)}
-              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+              className="px-2 py-0.5 rounded bg-void hover:bg-raised hover:text-plate text-chalk-2 border border-line transition-colors"
             >
               Apr–Jun
             </button>
             <button
               onClick={() => scrollToQuarter(3)}
-              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+              className="px-2 py-0.5 rounded bg-void hover:bg-raised hover:text-plate text-chalk-2 border border-line transition-colors"
             >
               Jul–Sep
             </button>
             <button
               onClick={() => scrollToQuarter(4)}
-              className="px-2 py-0.5 rounded bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] text-[#CBD5E1] border border-[#1E293B] transition-colors"
+              className="px-2 py-0.5 rounded bg-void hover:bg-raised hover:text-plate text-chalk-2 border border-line transition-colors"
             >
               Oct–Dec
             </button>
@@ -302,21 +314,21 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           <div className="flex items-center gap-1 ml-auto">
             <button
               onClick={() => handleScroll(-240)}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] rounded-md border border-[#1E293B] transition-all active:scale-95 shadow-sm"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-chalk-2 bg-void hover:bg-raised hover:text-plate rounded-lg border border-line transition-colors shadow-sm"
               title="Scroll earlier months (Left)"
               aria-label="Scroll earlier months"
             >
-              <ChevronLeft className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <ChevronLeft className="w-3.5 h-3.5 text-plate" />
               <span className="text-[11px]">Scroll Left</span>
             </button>
             <button
               onClick={() => handleScroll(240)}
-              className="flex items-center gap-1 px-2.5 py-1 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#38BDF8] rounded-md border border-[#1E293B] transition-all active:scale-95 shadow-sm"
+              className="flex items-center gap-1 px-2.5 py-1 text-xs font-semibold text-chalk-2 bg-void hover:bg-raised hover:text-plate rounded-lg border border-line transition-colors shadow-sm"
               title="Scroll later months (Right)"
               aria-label="Scroll later months"
             >
               <span className="text-[11px]">Scroll Right</span>
-              <ChevronRight className="w-3.5 h-3.5 text-[#38BDF8]" />
+              <ChevronRight className="w-3.5 h-3.5 text-plate" />
             </button>
           </div>
         </div>
@@ -327,21 +339,21 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
         ref={scrollRef}
         className={
           isFitToScreen
-            ? "w-full overflow-hidden rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-2.5"
-            : "overflow-x-auto pb-3 pt-2 touch-pan-x w-full custom-scrollbar rounded-xl border border-[#1E293B]/70 bg-[#0B0F17]/40 p-2 sm:p-2.5 scroll-smooth"
+            ? "w-full overflow-hidden rounded-lg border border-line/70 bg-void/40 p-2 sm:p-2.5"
+            : "overflow-x-auto pb-3 pt-2 touch-pan-x w-full custom-scrollbar rounded-lg border border-line/70 bg-void/40 p-2 sm:p-2.5 scroll-smooth"
         }
       >
         <div className={isFitToScreen ? "w-full select-none" : "w-max min-w-[980px] select-none"}>
           {/* Shared Standardized Month Labels across the top */}
           {isFitToScreen ? (
-            <div className="flex items-center gap-1 sm:gap-1.5 mb-1 text-[8px] sm:text-[9px] font-semibold text-[#64748B] select-none">
+            <div className="flex items-center gap-1 sm:gap-1.5 mb-1 text-[8px] sm:text-[9px] font-semibold text-ash select-none">
               <div className="w-9 sm:w-11 shrink-0" />
               <div className="w-2 shrink-0" />
               <div className="flex-1 relative h-3 select-none">
                 {masterMonthLabels.map((item, idx) => (
                   <div
                     key={idx}
-                    className="absolute whitespace-nowrap font-bold"
+                    className="absolute whitespace-nowrap font-semibold"
                     style={{ left: `${(item.weekIndex / 53) * 100}%` }}
                   >
                     {item.label}
@@ -350,11 +362,11 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
               </div>
             </div>
           ) : (
-            <div className="flex text-[11px] font-semibold text-[#64748B] mb-1.5 relative h-3.5 select-none">
+            <div className="flex text-[11px] font-semibold text-ash mb-1.5 relative h-3.5 select-none">
               {masterMonthLabels.map((item, idx) => (
                 <div
                   key={idx}
-                  className="absolute whitespace-nowrap font-bold"
+                  className="absolute whitespace-nowrap font-semibold"
                   style={{ left: `${item.weekIndex * 16 + 116}px` }}
                 >
                   {item.label}
@@ -366,30 +378,25 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           {/* Joined Year Charts (Stacked seamlessly with matching week columns) */}
           <div className="space-y-1.5 sm:space-y-2">
             {displayedYears.map((yearData, yIdx) => {
-              const volDisplay = unit === 'kg' ? yearData.volumeKg : yearData.volumeLbs;
-
               return (
                 <div
                   key={yearData.year}
                   className={`flex items-center gap-1 sm:gap-1.5 ${
-                    yIdx > 0 ? 'pt-1.5 sm:pt-2 border-t border-[#1E293B]/30' : ''
+                    yIdx > 0 ? 'pt-1.5 sm:pt-2 border-t border-line/30' : ''
                   }`}
                 >
                   {/* Left Column: Shrunk Year Badge & Stats */}
                   <div className="w-9 sm:w-11 shrink-0 text-left pr-0.5">
-                    <span className="text-[11px] sm:text-xs font-bold text-[#F8FAFC] tracking-tighter block leading-none">
+                    <span className="text-[11px] sm:text-xs font-semibold text-chalk block leading-none">
                       {yearData.year}
                     </span>
-                    <span className="text-[8px] sm:text-[9px] text-[#38BDF8] font-mono block leading-none mt-0.5">
+                    <span className="text-[9px] text-ash tabular-nums block leading-none mt-1">
                       {yearData.workoutCount}w
-                    </span>
-                    <span className="text-[7px] sm:text-[8px] text-[#64748B] font-mono block truncate leading-none mt-0.5">
-                      {volDisplay.toLocaleString()} {unit}
                     </span>
                   </div>
 
                   {/* Day of week labels */}
-                  <div className="flex flex-col gap-[1px] text-[7px] sm:text-[8px] font-semibold text-[#64748B] justify-between py-0.5 select-none shrink-0 w-2 text-center">
+                  <div className="flex flex-col gap-[1px] text-[9px] font-semibold text-ash justify-between py-0.5 select-none shrink-0 w-2 text-center">
                     {dayNames.map((name, i) => (
                       <span key={i} className="leading-none text-center">
                         {i % 2 === 1 ? name : ''}
@@ -410,8 +417,8 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
                                 key={dIdx}
                                 className={
                                   isFitToScreen
-                                    ? "w-full aspect-square rounded-[1px] sm:rounded-[2px] opacity-10 bg-[#1E293B]/20"
-                                    : "w-3 h-3 rounded-[2.5px] opacity-10 bg-[#1E293B]/20"
+                                    ? "w-full aspect-square rounded-[3px] sm:rounded-[4px] opacity-10 bg-raised/20"
+                                    : "w-3 h-3 rounded-[2.5px] opacity-10 bg-raised/20"
                                 }
                               />
                             );
@@ -437,13 +444,13 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
                               onMouseLeave={() => setHoveredDay(null)}
                               className={`${
                                 isFitToScreen
-                                  ? "w-full aspect-square rounded-[1px] sm:rounded-[2px]"
+                                  ? "w-full aspect-square rounded-[3px] sm:rounded-[4px]"
                                   : "w-3 h-3 rounded-[2.5px]"
                               } border cursor-pointer outline-none transition-colors touch-manipulation ${
                                 hasWorkout
-                                  ? 'hover:ring-2 hover:ring-[#2ba2fb] hover:ring-offset-1 hover:ring-offset-[#131D31]'
+                                  ? 'hover:ring-2 hover:ring-plate hover:ring-offset-1 hover:ring-offset-surface'
                                   : 'cursor-default'
-                              } ${getHeatmapColor(day.workouts.length)}`}
+                              } ${getHeatmapColor(day.workouts)}`}
                               aria-label={`${day.dateStr}: ${day.workouts.length} workout(s)`}
                             />
                           );
@@ -459,31 +466,34 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
       </div>
 
       {/* Bottom Legend */}
-      <div className="flex items-center gap-4 text-[11px] flex-wrap pt-2.5 border-t border-[#1E293B] text-[#94A3B8]">
+      <div className="flex items-center gap-4 text-[11px] flex-wrap pt-2.5 border-t border-line text-dust">
         <div className="flex items-center gap-1.5">
-          <span className={`w-3 h-3 rounded-[2px] ${theme === 'light' ? 'bg-[#E2E8F0] border border-[#CBD5E1]' : 'bg-[#1E293B]/70 border border-[#334155]/50'}`} title="0 workouts (Rest)"></span>
+          <span className={`w-3 h-3 rounded-[4px] ${theme === 'light' ? 'bg-raised border border-line' : 'bg-raised/70 border border-line-strong/50'}`} title="0 workouts (Rest)"></span>
           <span>Rest day</span>
         </div>
-        <div className="flex items-center gap-1.5">
-          <span className="w-3 h-3 rounded-[2px] bg-[#2ba2fb] border border-[#1d8de0] shadow-[0_0_5px_rgba(43,162,251,0.5)]" title="Workout logged"></span>
-          <span className="font-semibold text-[#F8FAFC]">Workout logged</span>
+        <div className="flex items-center gap-1.5" title="Darker cells moved more volume that day">
+          <span>Less</span>
+          {[1, 2, 3, 4].map(level => (
+            <span key={level} className={`w-3 h-3 rounded-[4px] border heat-cube-${level}`} />
+          ))}
+          <span>More</span>
         </div>
       </div>
 
       {/* Floating Hover Tooltip */}
       {hoveredDay && (
         <div
-          className={`fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 text-xs rounded-md py-2 px-3 shadow-2xl border min-w-[190px] max-w-[calc(100vw-32px)] animate-in fade-in ${
+          className={`fixed z-50 pointer-events-none -translate-x-1/2 -translate-y-full mb-2 text-xs rounded-lg py-2 px-3 shadow-2xl border min-w-[190px] max-w-[calc(100vw-32px)] animate-in fade-in ${
             theme === 'light'
-              ? 'bg-[#FAF6F0] text-[#2D2117] border-[#DAC6B2] shadow-[0_10px_25px_-5px_rgba(110,90,75,0.2)]'
-              : 'bg-[#0F172A] text-white border-[#334155]'
+              ? 'bg-surface text-chalk border-line shadow-lg'
+              : 'bg-raised text-white border-line-strong'
           }`}
           style={{
             left: `${typeof window !== 'undefined' ? Math.max(105, Math.min(window.innerWidth - 105, hoveredDay.x)) : hoveredDay.x}px`,
             top: `${hoveredDay.y}px`
           }}
         >
-          <div className="font-semibold text-[11px] text-[#94A3B8]">
+          <div className="font-semibold text-[11px] text-dust">
             {new Date(hoveredDay.dateStr).toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
@@ -492,20 +502,20 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
             })}
           </div>
           {hoveredDay.dayWorkouts.length === 0 ? (
-            <div className="text-[#64748B] text-[11px] mt-0.5">Rest / Recovery day</div>
+            <div className="text-ash text-[11px] mt-0.5">Rest / Recovery day</div>
           ) : (
             <div className="mt-1 space-y-1.5">
               {hoveredDay.dayWorkouts.map((w, idx) => (
-                <div key={idx} className="border-t border-[#1E293B] pt-1 first:border-0 first:pt-0">
-                  <div className="font-bold text-[#F8FAFC] text-xs leading-snug">{w.title}</div>
-                  <div className="text-[11px] text-[#38BDF8] flex items-center gap-1.5 mt-0.5 tabular-nums font-mono">
+                <div key={idx} className="border-t border-line pt-1 first:border-0 first:pt-0">
+                  <div className="font-semibold text-chalk text-xs leading-snug">{w.title}</div>
+                  <div className="text-[11px] text-plate flex items-center gap-1.5 mt-0.5 tabular-nums font-mono">
                     <span>
                       {(unit === 'kg' ? w.totalVolumeKg : w.totalVolumeLbs).toLocaleString()} {unit}
                     </span>
-                    <span aria-hidden="true" className="text-[#64748B]">·</span>
-                    <span className="font-sans text-[#CBD5E1]">{w.durationMinutes} min</span>
-                    <span aria-hidden="true" className="text-[#64748B]">·</span>
-                    <span className="font-sans text-[#CBD5E1]">{w.exercises.length} exs</span>
+                    <span aria-hidden="true" className="text-ash">·</span>
+                    <span className="font-sans text-chalk-2">{w.durationMinutes} min</span>
+                    <span aria-hidden="true" className="text-ash">·</span>
+                    <span className="font-sans text-chalk-2">{w.exercises.length} exs</span>
                   </div>
                 </div>
               ))}

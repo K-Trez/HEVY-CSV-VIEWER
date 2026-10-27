@@ -2,17 +2,30 @@ import React from 'react';
 import { UnitPreference, DatasetInfo } from '../types/workout';
 import { Dumbbell, UploadCloud, FileText, Trash2, Sun, Moon } from 'lucide-react';
 
+type View = 'overview' | 'workouts' | 'routines' | 'exercises' | 'muscles';
+
 interface HeaderProps {
   unit: UnitPreference;
   onToggleUnit: (unit: UnitPreference) => void;
   activeDataset: DatasetInfo | null;
   onOpenUpload: () => void;
   onClearData: () => void;
-  activeView: 'overview' | 'workouts' | 'exercises' | 'muscles';
-  onChangeView: (view: 'overview' | 'workouts' | 'exercises' | 'muscles') => void;
+  activeView: View;
+  onChangeView: (view: View) => void;
   theme: 'dark' | 'light';
   onToggleTheme: () => void;
 }
+
+const VIEWS: { id: View; label: string; short: string }[] = [
+  { id: 'overview', label: 'Overview', short: 'Overview' },
+  { id: 'workouts', label: 'Workout log', short: 'Workouts' },
+  { id: 'routines', label: 'Routines', short: 'Routines' },
+  { id: 'exercises', label: 'Exercises & PRs', short: 'Exercises' },
+  { id: 'muscles', label: 'Muscle balance', short: 'Muscles' },
+];
+
+const ACTIVE_VIEW = 'bg-surface text-chalk border-line shadow-sm';
+const IDLE_VIEW = 'text-dust hover:text-chalk hover:bg-raised border-transparent';
 
 export const Header: React.FC<HeaderProps> = ({
   unit,
@@ -26,93 +39,66 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
 }) => {
   return (
-    <header className="sticky top-0 z-30 bg-[#0B0F17]/90 backdrop-blur-md border-b border-[#1E293B] px-3 sm:px-8 py-2.5 sm:py-3 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto flex items-center justify-between gap-2.5 sm:gap-4 md:gap-8">
-        {/* Zone 1: Brand Title */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#2563EB] text-white flex items-center justify-center shadow-sm transition-all duration-200 hover:-translate-y-0.5 active:scale-95">
-            <Dumbbell className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.3]" />
+    <header className="sticky top-0 z-30 bg-void/85 backdrop-blur-md border-b border-line px-3 sm:px-6">
+      <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-6 py-2.5">
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-plate text-on-plate flex items-center justify-center">
+            <Dumbbell className="w-4 h-4 stroke-[2.2]" />
           </div>
           <div className="flex flex-col">
-            <span className="text-sm sm:text-base font-bold tracking-tight text-[#F8FAFC] whitespace-nowrap">
+            <span className="type-display text-sm sm:text-[15px] text-chalk whitespace-nowrap">
               Hevy Vault
             </span>
-            <span className="text-[10px] font-medium text-[#64748B] -mt-0.5 hidden sm:inline">
-              Workout CSV Explorer
+            <span className="hidden sm:block text-[11px] leading-tight text-ash">
+              Workout analytics
             </span>
           </div>
         </div>
 
-        {/* Zone 2: Navigation Links / Views (more square-y and animated) */}
         {activeDataset && (
-          <nav className="hidden md:flex items-center gap-1 bg-[#111A2E] p-1 rounded-md border border-[#1E293B] transition-all">
-            <button
-              onClick={() => onChangeView('overview')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-sm transition-all duration-150 whitespace-nowrap shrink-0 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] ${
-                activeView === 'overview'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]/60'
-              }`}
-            >
-              Overview
-            </button>
-            <button
-              onClick={() => onChangeView('workouts')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-sm transition-all duration-150 whitespace-nowrap shrink-0 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] ${
-                activeView === 'workouts'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]/60'
-              }`}
-            >
-              Workouts Log
-            </button>
-            <button
-              onClick={() => onChangeView('exercises')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-sm transition-all duration-150 whitespace-nowrap shrink-0 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] ${
-                activeView === 'exercises'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]/60'
-              }`}
-            >
-              Exercises & PRs
-            </button>
-            <button
-              onClick={() => onChangeView('muscles')}
-              className={`px-3 py-1.5 text-xs font-bold rounded-sm transition-all duration-150 whitespace-nowrap shrink-0 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.97] ${
-                activeView === 'muscles'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B]/60'
-              }`}
-            >
-              Muscle Balance
-            </button>
+          <nav
+            aria-label="Views"
+            className="hidden xl:flex items-center gap-1 bg-sunken p-1 rounded-lg border border-line"
+          >
+            {VIEWS.map(v => (
+              <button
+                key={v.id}
+                onClick={() => onChangeView(v.id)}
+                aria-current={activeView === v.id ? 'page' : undefined}
+                className={`px-3 py-1.5 text-[12.5px] font-medium rounded-md border whitespace-nowrap shrink-0 ${
+                  activeView === v.id ? ACTIVE_VIEW : IDLE_VIEW
+                }`}
+              >
+                {v.label}
+              </button>
+            ))}
           </nav>
         )}
 
-        {/* Zone 3: Primary Action & Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-          {/* Theme Toggle Button: Pastel Orange & Tan Light Mode vs Dark Blue */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
           <button
             onClick={onToggleTheme}
-            className="flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded-md bg-[#111A2E] text-[#94A3B8] hover:text-[#F8FAFC] border border-[#1E293B] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 shadow-sm"
-            title={theme === 'dark' ? 'Switch to Pastel Orange & Tan (Light Mode)' : 'Switch to Dark Blue Mode'}
-            aria-label="Toggle theme"
+            className="flex items-center justify-center w-8 h-8 rounded-lg text-dust hover:text-chalk hover:bg-raised border border-transparent hover:border-line"
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
           >
             {theme === 'dark' ? (
-              <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#FB923C] hover:rotate-45 transition-transform duration-300" />
+              <Sun className="w-4 h-4" />
             ) : (
-              <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#EA580C] hover:-rotate-12 transition-transform duration-300" />
+              <Moon className="w-4 h-4" />
             )}
           </button>
 
-          {/* Unit Toggle Switch: Square-y buttons */}
-          <div className="flex items-center bg-[#111A2E] p-0.5 rounded-md border border-[#1E293B] text-[11px] sm:text-xs font-semibold">
+          <div
+            className="flex items-center bg-sunken p-0.5 rounded-lg border border-line text-xs font-medium"
+            role="group"
+            aria-label="Weight unit"
+          >
             <button
               onClick={() => onToggleUnit('kg')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                unit === 'kg'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+              aria-pressed={unit === 'kg'}
+              className={`px-2.5 py-1 rounded-md ${
+                unit === 'kg' ? 'bg-plate text-on-plate' : 'text-dust hover:text-chalk'
               }`}
               title="Display weights in kilograms"
             >
@@ -120,10 +106,9 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
             <button
               onClick={() => onToggleUnit('lbs')}
-              className={`px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95 ${
-                unit === 'lbs'
-                  ? 'bg-[#2563EB] text-white shadow-sm'
-                  : 'text-[#94A3B8] hover:text-[#F8FAFC]'
+              aria-pressed={unit === 'lbs'}
+              className={`px-2.5 py-1 rounded-md ${
+                unit === 'lbs' ? 'bg-plate text-on-plate' : 'text-dust hover:text-chalk'
               }`}
               title="Display weights in pounds"
             >
@@ -131,72 +116,49 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Active File Name Badge (if loaded) */}
           {activeDataset && (
-            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs font-medium bg-[#131D31] text-[#E2E8F0] rounded-md border border-[#1E293B] max-w-[170px]">
-              <FileText className="w-3.5 h-3.5 text-[#38BDF8] shrink-0" />
+            <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-sunken text-dust rounded-md border border-line max-w-[180px]">
+              <FileText className="w-3.5 h-3.5 text-ash shrink-0" />
               <span className="truncate">{activeDataset.filename}</span>
             </div>
           )}
 
-          {/* Clear CSV Button (if loaded) */}
           {activeDataset && (
             <button
               onClick={onClearData}
-              className="p-1 sm:p-1.5 text-xs font-medium text-[#94A3B8] hover:text-[#F87171] hover:bg-[#1E293B] rounded-md border border-[#1E293B] transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+              className="flex items-center justify-center w-8 h-8 text-dust hover:text-danger hover:bg-tint-ply rounded-lg border border-transparent hover:border-danger/30"
               title="Clear loaded CSV"
+              aria-label="Clear loaded CSV"
             >
-              <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+              <Trash2 className="w-4 h-4" />
             </button>
           )}
 
-          {/* Upload Button: Square-y with micro-interaction */}
           <button
             onClick={onOpenUpload}
-            className="flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 rounded-md shadow-sm whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 text-xs sm:text-[13px] font-medium text-white bg-ply hover:bg-ply-deep rounded-lg shadow-sm whitespace-nowrap shrink-0"
           >
-            <UploadCloud className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+            <UploadCloud className="w-4 h-4" />
             <span className="hidden sm:inline">{activeDataset ? 'Upload CSV' : 'Upload Hevy CSV'}</span>
             <span className="sm:hidden">Upload</span>
           </button>
         </div>
       </div>
 
-      {/* Mobile view navigation tab bar: Shrink to fit screen perfectly without overflow */}
       {activeDataset && (
-        <div className="md:hidden grid grid-cols-4 gap-1 mt-2 pt-2 border-t border-[#1E293B] w-full select-none">
-          <button
-            onClick={() => onChangeView('overview')}
-            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
-              activeView === 'overview' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => onChangeView('workouts')}
-            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
-              activeView === 'workouts' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            Workouts
-          </button>
-          <button
-            onClick={() => onChangeView('exercises')}
-            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
-              activeView === 'exercises' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            Exercises
-          </button>
-          <button
-            onClick={() => onChangeView('muscles')}
-            className={`py-1.5 px-0.5 text-[11px] font-bold rounded-sm text-center transition-all duration-150 hover:-translate-y-0.5 active:scale-95 truncate ${
-              activeView === 'muscles' ? 'bg-[#2563EB] text-white shadow-sm' : 'text-[#94A3B8] hover:text-[#F8FAFC]'
-            }`}
-          >
-            Muscles
-          </button>
+        <div className="xl:hidden grid grid-cols-5 gap-1 bg-sunken border border-line p-1 rounded-lg mb-2 select-none">
+          {VIEWS.map(v => (
+            <button
+              key={v.id}
+              onClick={() => onChangeView(v.id)}
+              aria-current={activeView === v.id ? 'page' : undefined}
+              className={`py-1.5 px-0.5 text-[11.5px] font-medium rounded-md text-center border transition-colors duration-150 truncate ${
+                activeView === v.id ? ACTIVE_VIEW : IDLE_VIEW
+              }`}
+            >
+              {v.short}
+            </button>
+          ))}
         </div>
       )}
     </header>

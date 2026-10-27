@@ -80,18 +80,18 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
   return (
     <div className="space-y-5">
       {/* Push / Pull / Legs Ratio Strip */}
-      <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] shadow-sm">
+      <div className="bg-surface rounded-xl p-5 border border-line shadow-sm">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
-            <h2 className="text-sm font-bold text-[#F8FAFC] flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#38BDF8]" />
+            <h2 className="text-sm font-semibold text-chalk flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-plate" />
               Push / Pull / Legs Balance Ratio
             </h2>
-            <div className="text-xs text-[#94A3B8] mt-0.5">
+            <div className="text-xs text-dust mt-0.5">
               Distribution of working sets across primary kinetic movement planes
             </div>
           </div>
-          <div className="text-xs text-[#38BDF8] font-semibold bg-[#0C4A6E]/40 px-3 py-1 rounded-xl border border-[#0284C7]/40">
+          <div className="text-xs text-plate font-semibold bg-tint-plate/60 px-3 py-1 rounded-lg border border-plate/30">
             {analytics.pushPct >= 25 && analytics.pullPct >= 25 && analytics.legsPct >= 25
               ? 'Well-Balanced Training Split'
               : 'Specialization Focus'}
@@ -99,52 +99,52 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
         </div>
 
         {/* Stacked Progress Bar with modern dark blue tones */}
-        <div className="h-4 rounded-full overflow-hidden flex bg-[#0B0F17] p-0.5 border border-[#1E293B] gap-0.5">
+        <div className="h-4 rounded-full overflow-hidden flex bg-void p-0.5 border border-line gap-0.5">
           <div
             style={{ width: `${analytics.pushPct}%` }}
-            className="h-full bg-[#3B82F6] rounded-l-full transition-all"
+            className="h-full bg-plate rounded-l-full transition-colors"
             title={`Push: ${analytics.pushPct}% (${analytics.pushSets} sets)`}
           />
           <div
             style={{ width: `${analytics.pullPct}%` }}
-            className="h-full bg-[#10B981] transition-all"
+            className="h-full bg-grn transition-colors"
             title={`Pull: ${analytics.pullPct}% (${analytics.pullSets} sets)`}
           />
           <div
             style={{ width: `${analytics.legsPct}%` }}
-            className="h-full bg-[#818CF8] rounded-r-full transition-all"
+            className="h-full bg-steel rounded-r-full transition-colors"
             title={`Legs: ${analytics.legsPct}% (${analytics.legsSets} sets)`}
           />
         </div>
 
         {/* 3 Zone Labels */}
         <div className="grid grid-cols-3 gap-1.5 sm:gap-4 mt-3 text-center">
-          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-[11px] sm:text-xs font-bold text-[#60A5FA] flex items-center justify-center gap-1 sm:gap-1.5">
-              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#3B82F6] shrink-0" />
+          <div className="bg-void p-2 sm:p-2.5 rounded-lg border border-line">
+            <div className="text-[11px] sm:text-xs font-semibold text-steel flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-plate shrink-0" />
               <span>Push: {analytics.pushPct}%</span>
             </div>
-            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+            <div className="text-[10px] sm:text-[11px] text-dust mt-0.5 font-mono tabular-nums">
               {analytics.pushSets} sets <span className="hidden sm:inline">(Chest, OHP, Tri)</span>
             </div>
           </div>
 
-          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-[11px] sm:text-xs font-bold text-[#34D399] flex items-center justify-center gap-1 sm:gap-1.5">
-              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#10B981] shrink-0" />
+          <div className="bg-void p-2 sm:p-2.5 rounded-lg border border-line">
+            <div className="text-[11px] sm:text-xs font-semibold text-grn flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-grn shrink-0" />
               <span>Pull: {analytics.pullPct}%</span>
             </div>
-            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+            <div className="text-[10px] sm:text-[11px] text-dust mt-0.5 font-mono tabular-nums">
               {analytics.pullSets} sets <span className="hidden sm:inline">(Back, Rows, Bi)</span>
             </div>
           </div>
 
-          <div className="bg-[#0B0F17] p-2 sm:p-2.5 rounded-xl border border-[#1E293B]">
-            <div className="text-[11px] sm:text-xs font-bold text-[#A5B4FC] flex items-center justify-center gap-1 sm:gap-1.5">
-              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-[#818CF8] shrink-0" />
+          <div className="bg-void p-2 sm:p-2.5 rounded-lg border border-line">
+            <div className="text-[11px] sm:text-xs font-semibold text-steel flex items-center justify-center gap-1 sm:gap-1.5">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-steel shrink-0" />
               <span>Legs: {analytics.legsPct}%</span>
             </div>
-            <div className="text-[10px] sm:text-[11px] text-[#94A3B8] mt-0.5 font-mono tabular-nums">
+            <div className="text-[10px] sm:text-[11px] text-dust mt-0.5 font-mono tabular-nums">
               {analytics.legsSets} sets <span className="hidden sm:inline">(Quads, Hams, Calves)</span>
             </div>
           </div>
@@ -152,12 +152,12 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
       </div>
 
       {/* Muscle By Muscle Detailed Bars */}
-      <div className="bg-[#131D31] rounded-2xl p-3.5 sm:p-5 border border-[#1E293B] shadow-sm">
-        <h3 className="text-sm font-bold text-[#F8FAFC] mb-1 flex items-center gap-2">
-          <PieChart className="w-4 h-4 text-[#38BDF8]" />
+      <div className="bg-surface rounded-xl p-3.5 sm:p-5 border border-line shadow-sm">
+        <h3 className="text-sm font-semibold text-chalk mb-1 flex items-center gap-2">
+          <PieChart className="w-4 h-4 text-plate" />
           Target Muscle Group Distribution
         </h3>
-        <p className="text-xs text-[#94A3B8] mb-5">
+        <p className="text-xs text-dust mb-5">
           Based on {analytics.totalWorkingSets} total working sets logged in this dataset
         </p>
 
@@ -169,32 +169,32 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
               <div key={item.muscle} className="space-y-1.5">
                 <div className="flex items-center justify-between text-xs">
                   <div className="flex items-center gap-2">
-                    <span className={`font-bold ${style.text}`}>
+                    <span className={`font-semibold ${style.text}`}>
                       {item.muscle}
                     </span>
-                    <span className="text-[#64748B] text-[11px]">
+                    <span className="text-ash text-[11px]">
                       ({item.exerciseCount} exercise{item.exerciseCount > 1 ? 's' : ''})
                     </span>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className="font-extrabold text-[#F8FAFC] tabular-nums font-mono text-xs">
+                    <span className="font-semibold text-chalk tabular-nums font-mono text-xs">
                       {item.sets} sets
                     </span>
-                    <span className="text-[11px] text-[#94A3B8] tabular-nums font-mono w-10 text-right">
+                    <span className="text-[11px] text-dust tabular-nums font-mono w-10 text-right">
                       {item.percentage}%
                     </span>
-                    <span className="text-[11px] text-[#94A3B8] tabular-nums font-mono hidden sm:inline w-24 text-right">
+                    <span className="text-[11px] text-dust tabular-nums font-mono hidden sm:inline w-24 text-right">
                       {Math.round(item.volume).toLocaleString()} {unit}
                     </span>
                   </div>
                 </div>
 
                 {/* Progress bar */}
-                <div className="h-2.5 rounded-full bg-[#0B0F17] overflow-hidden border border-[#1E293B]">
+                <div className="h-2.5 rounded-full bg-void overflow-hidden border border-line">
                   <div
                     style={{ width: `${item.percentage}%` }}
-                    className={`h-full ${style.bar} rounded-full transition-all`}
+                    className={`h-full ${style.bar} rounded-full transition-colors`}
                   />
                 </div>
 
@@ -204,13 +204,13 @@ export const MuscleDistribution: React.FC<MuscleDistributionProps> = ({
                     <button
                       key={exName}
                       onClick={() => onSelectExercise && onSelectExercise(exName)}
-                      className="text-[10px] font-semibold text-[#94A3B8] bg-[#0B0F17] hover:bg-[#1E293B] hover:text-[#F8FAFC] px-2 py-0.5 rounded-sm border border-[#1E293B] transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+                      className="text-[10px] font-semibold text-dust bg-void hover:bg-raised hover:text-chalk px-2 py-0.5 rounded-[4px] border border-line transition-colors duration-150"
                     >
                       {exName}
                     </button>
                   ))}
                   {item.exercises.length > 4 && (
-                    <span className="text-[10px] text-[#64748B] self-center">
+                    <span className="text-[10px] text-ash self-center">
                       +{item.exercises.length - 4} more
                     </span>
                   )}

@@ -74,16 +74,16 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   return (
     <div className="space-y-4">
       {/* Search and Filters Bar */}
-      <div className="bg-[#131D31] rounded-2xl p-4 border border-[#1E293B] shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-surface rounded-xl p-4 border border-line shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="w-4 h-4 text-[#64748B] absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-ash absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search workouts, routines, or exercises (e.g. Bench, Squat)..."
-            className="w-full pl-10 pr-4 py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#F8FAFC] placeholder-[#64748B] focus:outline-none focus:border-[#3B82F6] transition-colors"
+            className="w-full pl-10 pr-4 py-2 text-xs bg-void border border-line rounded-lg text-chalk placeholder-ash focus:outline-none focus:border-plate transition-colors"
           />
         </div>
 
@@ -91,11 +91,11 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
         <div className="flex items-center gap-2 flex-wrap w-full md:w-auto justify-between sm:justify-start">
           {/* Routine filter */}
           <div className="flex items-center gap-1.5 text-xs flex-1 sm:flex-initial min-w-[120px]">
-            <Filter className="w-3.5 h-3.5 text-[#64748B] hidden sm:inline" />
+            <Filter className="w-3.5 h-3.5 text-ash hidden sm:inline" />
             <select
               value={routineFilter}
               onChange={e => setRoutineFilter(e.target.value)}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-void border border-line rounded-lg text-chalk-2 focus:outline-none focus:border-plate transition-colors"
             >
               <option value="all">All Routines ({workouts.length})</option>
               {uniqueRoutines.map(r => (
@@ -108,11 +108,11 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
 
           {/* Sort selector */}
           <div className="flex items-center gap-1.5 text-xs flex-1 sm:flex-initial min-w-[110px]">
-            <ArrowUpDown className="w-3.5 h-3.5 text-[#64748B] hidden sm:inline" />
+            <ArrowUpDown className="w-3.5 h-3.5 text-ash hidden sm:inline" />
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value as any)}
-              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-[#0B0F17] border border-[#1E293B] rounded-md text-[#CBD5E1] focus:outline-none focus:border-[#3B82F6] transition-colors"
+              className="w-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs bg-void border border-line rounded-lg text-chalk-2 focus:outline-none focus:border-plate transition-colors"
             >
               <option value="date-desc">Newest First</option>
               <option value="date-asc">Oldest First</option>
@@ -121,17 +121,17 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
           </div>
 
           {/* Expand/Collapse Toggle: square-y buttons */}
-          <div className="flex items-center gap-1 border-l border-[#1E293B] pl-2 text-xs shrink-0">
+          <div className="flex items-center gap-1 border-l border-line pl-2 text-xs shrink-0">
             <button
               onClick={expandAll}
-              className="px-2.5 py-1 text-xs font-bold text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+              className="px-2.5 py-1 text-xs font-semibold text-dust hover:text-chalk hover:bg-raised rounded-[4px] transition-colors duration-150"
               title="Expand all workouts"
             >
               Expand
             </button>
             <button
               onClick={collapseAll}
-              className="px-2.5 py-1 text-xs font-bold text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#1E293B] rounded-sm transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+              className="px-2.5 py-1 text-xs font-semibold text-dust hover:text-chalk hover:bg-raised rounded-[4px] transition-colors duration-150"
               title="Collapse all workouts"
             >
               Collapse
@@ -141,14 +141,14 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
       </div>
 
       {/* Result Count */}
-      <div className="flex items-center justify-between text-xs text-[#94A3B8] px-1">
+      <div className="flex items-center justify-between text-xs text-dust px-1">
         <div>
-          Showing <span className="font-semibold text-[#F8FAFC]">{filteredWorkouts.length}</span> of {workouts.length} workouts
+          Showing <span className="font-semibold text-chalk">{filteredWorkouts.length}</span> of {workouts.length} workouts
         </div>
         {searchTerm && (
           <button
             onClick={() => setSearchTerm('')}
-            className="text-[#38BDF8] hover:underline font-medium"
+            className="text-plate hover:underline font-medium"
           >
             Clear search
           </button>
@@ -157,10 +157,10 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
 
       {/* Workout Cards */}
       {filteredWorkouts.length === 0 ? (
-        <div className="bg-[#131D31] rounded-2xl p-12 text-center border border-[#1E293B]">
-          <Dumbbell className="w-10 h-10 text-[#334155] mx-auto mb-3" />
-          <h3 className="text-base font-bold text-[#F8FAFC]">No workouts found</h3>
-          <p className="text-xs text-[#94A3B8] mt-1 max-w-sm mx-auto">
+        <div className="bg-surface rounded-xl p-12 text-center border border-line">
+          <Dumbbell className="w-10 h-10 text-ash mx-auto mb-3" />
+          <h3 className="text-base font-semibold text-chalk">No workouts found</h3>
+          <p className="text-xs text-dust mt-1 max-w-sm mx-auto">
             Try adjusting your search keywords or switching routine filters.
           </p>
         </div>
@@ -177,34 +177,34 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             return (
               <div
                 key={workout.id}
-                className="bg-[#131D31] rounded-2xl border border-[#1E293B] shadow-sm hover:border-[#3B82F6]/40 transition-all overflow-hidden"
+                className="bg-surface rounded-xl border border-line shadow-sm hover:border-plate/40 transition-colors overflow-hidden"
               >
                 {/* Workout Card Header */}
                 <div
                   onClick={() => toggleExpand(workout.id)}
-                  className="p-3.5 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-[#1E293B]/40 transition-colors"
+                  className="p-3.5 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-3 cursor-pointer hover:bg-raised/40 transition-colors"
                 >
                   <div className="flex items-start gap-3.5">
-                    <div className="w-10 h-10 rounded-xl bg-[#1E3A8A]/40 text-[#60A5FA] flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-10 h-10 rounded-lg bg-raised text-ash flex items-center justify-center shrink-0 mt-0.5">
                       <Dumbbell className="w-5 h-5" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="text-base font-bold text-[#F8FAFC]">
+                        <h3 className="text-base font-semibold text-chalk">
                           {workout.title}
                         </h3>
                         {prCount > 0 && (
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-[#38BDF8] bg-[#0C4A6E]/40 px-2 py-0.5 rounded-lg border border-[#0284C7]/40">
-                            <Trophy className="w-3.5 h-3.5 fill-[#38BDF8]" />
+                          <span className="flex items-center gap-1 text-[11px] font-semibold text-plate bg-tint-plate/60 px-2 py-0.5 rounded-[4px] border border-plate/30">
+                            <Trophy className="w-3.5 h-3.5 fill-plate" />
                             {prCount} PR{prCount > 1 ? 's' : ''}
                           </span>
                         )}
                       </div>
 
                       {/* Clean Unboxed Metadata */}
-                      <div className="flex items-center gap-2 text-xs text-[#94A3B8] mt-1 flex-wrap">
+                      <div className="flex items-center gap-2 text-xs text-dust mt-1 flex-wrap">
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3 h-3 text-[#64748B]" />
+                          <Calendar className="w-3 h-3 text-ash" />
                           {workout.startTime.toLocaleDateString('en-US', {
                             weekday: 'short',
                             month: 'short',
@@ -217,24 +217,24 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                             minute: '2-digit',
                           })}
                         </span>
-                        <span aria-hidden="true" className="text-[#475569]">·</span>
+                        <span aria-hidden="true" className="text-ash">·</span>
                         <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3 text-[#64748B]" />
+                          <Clock className="w-3 h-3 text-ash" />
                           {workout.durationMinutes} min
                         </span>
-                        <span aria-hidden="true" className="text-[#475569]">·</span>
+                        <span aria-hidden="true" className="text-ash">·</span>
                         <span>{workout.exercises.length} exercises</span>
                       </div>
                     </div>
                   </div>
 
                   {/* Right side stats & toggle */}
-                  <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-[#1E293B]">
+                  <div className="flex items-center justify-between md:justify-end gap-4 border-t md:border-t-0 pt-2 md:pt-0 border-line">
                     <div className="text-left md:text-right">
-                      <div className="text-sm sm:text-base font-extrabold text-[#F8FAFC] tabular-nums font-mono">
+                      <div className="text-sm sm:text-base font-semibold text-chalk tabular-nums font-mono">
                         {volume.toLocaleString()} {unit}
                       </div>
-                      <div className="text-[11px] text-[#94A3B8]">
+                      <div className="text-[11px] text-dust">
                         {workout.totalSets} sets · {workout.totalReps} reps
                       </div>
                     </div>
@@ -245,12 +245,12 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                           e.stopPropagation();
                           onSelectWorkout(workout);
                         }}
-                        className="px-3 py-1.5 text-xs font-bold text-[#E2E8F0] bg-[#1E293B] hover:bg-[#2563EB] hover:text-white rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 whitespace-nowrap shadow-sm"
+                        className="px-3 py-1.5 text-xs font-semibold text-chalk-2 bg-raised hover:bg-plate hover:text-on-plate rounded-lg transition-colors duration-150 whitespace-nowrap shadow-sm"
                       >
                         Inspect
                       </button>
                       <button
-                        className="w-8 h-8 rounded-md bg-[#0B0F17] text-[#94A3B8] flex items-center justify-center hover:bg-[#1E293B] hover:text-[#F8FAFC] transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
+                        className="w-8 h-8 rounded-lg bg-void text-dust flex items-center justify-center hover:bg-raised hover:text-chalk transition-colors duration-150 border border-line"
                         aria-label={isExpanded ? 'Collapse' : 'Expand'}
                       >
                         {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -261,15 +261,15 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
 
                 {/* Workout description notes */}
                 {workout.description && (
-                  <div className="px-4 sm:px-5 pb-3 -mt-1 text-xs text-[#94A3B8] flex items-start gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-[#64748B] shrink-0 mt-0.5" />
+                  <div className="px-4 sm:px-5 pb-3 -mt-1 text-xs text-dust flex items-start gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-ash shrink-0 mt-0.5" />
                     <span className="italic">"{workout.description}"</span>
                   </div>
                 )}
 
                 {/* Expanded Exercise Breakdown */}
                 {isExpanded && (
-                  <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-[#1E293B] bg-[#0B0F17]/40 space-y-3">
+                  <div className="px-4 sm:px-5 pb-5 pt-1 border-t border-line bg-void/40 space-y-3">
                     {workout.exercises.map((ex, exIdx) => {
                       const muscleStyle = MUSCLE_COLORS[ex.muscleGroup] || MUSCLE_COLORS['Full Body'];
                       const bestWeight = unit === 'kg' ? ex.bestSetWeightKg : ex.bestSetWeightLbs;
@@ -278,14 +278,14 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                       return (
                         <div
                           key={exIdx}
-                          className="bg-[#131D31] rounded-xl p-3.5 border border-[#1E293B] shadow-sm hover:border-[#334155] transition-colors"
+                          className="bg-surface rounded-lg p-3.5 border border-line shadow-sm hover:border-line-strong transition-colors"
                         >
                           {/* Exercise Header */}
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2.5">
                             <div className="flex items-center gap-2 flex-wrap">
                               <button
                                 onClick={() => onSelectExercise(ex.exerciseTitle)}
-                                className="font-bold text-sm text-[#F8FAFC] hover:text-[#38BDF8] hover:underline transition-colors text-left"
+                                className="font-semibold text-sm text-chalk hover:text-plate hover:underline transition-colors text-left"
                               >
                                 {ex.exerciseTitle}
                               </button>
@@ -293,23 +293,23 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                                 {ex.muscleGroup}
                               </span>
                               {ex.supersetId && (
-                                <span className="text-[10px] font-bold text-[#A5B4FC] bg-[#312E81]/30 px-1.5 py-0.5 rounded-md border border-[#4F46E5]/40">
+                                <span className="text-[10px] font-semibold text-steel bg-tint-steel/30 px-1.5 py-0.5 rounded-lg border border-steel/40">
                                   Superset #{ex.supersetId}
                                 </span>
                               )}
                             </div>
 
-                            <div className="text-xs text-[#94A3B8] flex items-center gap-2">
+                            <div className="text-xs text-dust flex items-center gap-2">
                               {bestWeight > 0 && (
                                 <span>
-                                  Top set: <strong className="tabular-nums font-mono text-[#F8FAFC]">{bestWeight} {unit}</strong>
+                                  Top set: <strong className="tabular-nums font-mono text-chalk">{bestWeight} {unit}</strong>
                                 </span>
                               )}
                               {best1RM > 0 && (
                                 <>
-                                  <span aria-hidden="true" className="text-[#475569]">·</span>
+                                  <span aria-hidden="true" className="text-ash">·</span>
                                   <span>
-                                    Est. 1RM: <strong className="tabular-nums font-mono text-[#38BDF8]">{best1RM} {unit}</strong>
+                                    Est. 1RM: <strong className="tabular-nums font-mono text-plate">{best1RM} {unit}</strong>
                                   </span>
                                 </>
                               )}
@@ -317,7 +317,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                           </div>
 
                           {ex.notes && (
-                            <div className="text-[11px] text-[#64748B] italic mb-2">
+                            <div className="text-[11px] text-ash italic mb-2">
                               Note: {ex.notes}
                             </div>
                           )}
@@ -333,19 +333,19 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                               return (
                                 <div
                                   key={sIdx}
-                                  className={`rounded-lg p-2 text-xs border transition-all ${
+                                  className={`rounded-lg p-2 text-xs border transition-colors ${
                                     set.isPR
-                                      ? 'bg-[#1E3A8A]/40 border-[#3B82F6]/70 shadow-[0_0_10px_rgba(59,130,246,0.3)]'
+                                      ? 'bg-tint-plate/60 border-plate/50'
                                       : isWarmup
-                                      ? 'bg-[#0E1626] border-[#1E293B] opacity-75'
+                                      ? 'bg-void border-line opacity-75'
                                       : isFailure
-                                      ? 'bg-[#4C1D95]/20 border-[#7E22CE]/40'
+                                      ? 'bg-tint-ply/40 border-danger/25'
                                       : isDropset
-                                      ? 'bg-[#312E81]/20 border-[#4F46E5]/40'
-                                      : 'bg-[#0B0F17] border-[#1E293B]'
+                                      ? 'bg-tint-ply/40 border-danger/25'
+                                      : 'bg-void border-line'
                                   }`}
                                 >
-                                  <div className="flex items-center justify-between text-[10px] text-[#64748B] font-medium mb-1">
+                                  <div className="flex items-center justify-between text-[10px] text-ash font-medium mb-1">
                                     <span>
                                       Set {set.index}
                                       {isWarmup && ' (W)'}
@@ -353,18 +353,18 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
                                       {isDropset && ' (D)'}
                                     </span>
                                     {set.isPR && (
-                                      <span className="flex items-center text-[#38BDF8] font-bold">
-                                        <Trophy className="w-3 h-3 fill-[#38BDF8]" />
+                                      <span className="flex items-center text-plate font-semibold">
+                                        <Trophy className="w-3 h-3 fill-plate" />
                                         PR
                                       </span>
                                     )}
                                   </div>
-                                  <div className="font-extrabold text-[#F8FAFC] tabular-nums font-mono text-xs">
+                                  <div className="font-semibold text-chalk tabular-nums font-mono text-xs">
                                     {weight > 0 ? `${weight} ${unit}` : 'Bodyweight'}
-                                    <span className="text-[#94A3B8] font-sans font-normal ml-1">× {set.reps}</span>
+                                    <span className="text-dust font-sans font-normal ml-1">× {set.reps}</span>
                                   </div>
                                   {set.rpe && (
-                                    <div className="text-[10px] text-[#64748B] mt-0.5">
+                                    <div className="text-[10px] text-ash mt-0.5">
                                       RPE {set.rpe}
                                     </div>
                                   )}

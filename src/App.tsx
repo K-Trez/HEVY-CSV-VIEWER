@@ -5,6 +5,7 @@ import { Header } from './components/Header';
 import { MetricCards } from './components/MetricCards';
 import { HeatmapCalendar } from './components/HeatmapCalendar';
 import { WorkoutList } from './components/WorkoutList';
+import { RoutinesView } from './components/RoutinesView';
 import { ExerciseAnalytics } from './components/ExerciseAnalytics';
 import { MuscleDistribution } from './components/MuscleDistribution';
 import { MuscleRadarChart } from './components/MuscleRadarChart';
@@ -52,7 +53,7 @@ export default function App() {
     return null;
   });
 
-  const [activeView, setActiveView] = useState<'overview' | 'workouts' | 'exercises' | 'muscles'>('overview');
+  const [activeView, setActiveView] = useState<'overview' | 'workouts' | 'routines' | 'exercises' | 'muscles'>('overview');
   const [selectedWorkoutForModal, setSelectedWorkoutForModal] = useState<Workout | null>(null);
   const [selectedExerciseForAnalytics, setSelectedExerciseForAnalytics] = useState<string | undefined>(undefined);
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
@@ -166,12 +167,14 @@ export default function App() {
     });
   };
 
+  // Theme tokens live on the root element so the page background, scrollbars and
+  // overscroll gutter all follow the active theme.
+  React.useEffect(() => {
+    document.documentElement.classList.toggle('theme-light', theme === 'light');
+  }, [theme]);
+
   return (
-    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-200 overflow-x-hidden ${
-      theme === 'dark'
-        ? 'theme-dark bg-[#0B0F17] text-[#F1F5F9]'
-        : 'theme-light bg-[#F5ECE1] text-[#2D2117]'
-    }`}>
+    <div className="min-h-screen flex flex-col font-sans transition-colors duration-200 overflow-x-hidden bg-void text-chalk">
       {/* Navigation Header */}
       <Header
         unit={unit}
@@ -191,19 +194,19 @@ export default function App() {
         {!parsedData && (
           <div className="max-w-2xl mx-auto py-12 space-y-6 animate-in fade-in">
             <div className="text-center space-y-3">
-              <div className="w-14 h-14 rounded-md bg-[#2563EB] text-white flex items-center justify-center mx-auto shadow-sm transition-transform hover:scale-105 duration-200">
-                <Dumbbell className="w-7 h-7 stroke-[2.2]" />
+              <div className="w-12 h-12 rounded-xl bg-tint-plate text-plate border border-plate/20 flex items-center justify-center mx-auto">
+                <Dumbbell className="w-6 h-6 stroke-[2.2]" />
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC]">
+              <h1 className="text-2xl sm:text-3xl font-semibold text-chalk">
                 Hevy Workout Vault
               </h1>
-              <p className="text-sm text-[#94A3B8] max-w-md mx-auto">
-                Upload your <code className="bg-[#1E293B] px-1.5 py-0.5 rounded text-[#38BDF8]">workout_data.csv</code> to explore your all-time workout logs, 1RM progression charts, and muscle splits.
+              <p className="text-sm text-dust max-w-md mx-auto">
+                Upload your <code className="bg-raised px-1.5 py-0.5 rounded text-plate">workout_data.csv</code> to explore your all-time workout logs, 1RM progression charts, and muscle splits.
               </p>
             </div>
 
             {uploadError && (
-              <div className="p-3.5 rounded-md bg-[#7F1D1D]/30 border border-[#DC2626]/40 text-[#FCA5A5] text-xs flex items-center gap-2">
+              <div className="p-3.5 rounded-lg bg-tint-ply/60 border border-danger/25 text-danger text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{uploadError}</span>
               </div>
@@ -217,23 +220,23 @@ export default function App() {
                 setDragActive(true);
               }}
               onDragLeave={() => setDragActive(false)}
-              className={`border-2 border-dashed rounded-2xl p-10 text-center transition-all bg-[#131D31] ${
+              className={`border border-dashed rounded-xl p-10 text-center transition-colors bg-surface ${
                 dragActive
-                  ? 'border-[#3B82F6] bg-[#1E3A8A]/20'
-                  : 'border-[#1E293B] hover:border-[#3B82F6]/60'
+                  ? 'border-plate bg-tint-plate/50'
+                  : 'border-line-strong hover:border-plate/50'
               }`}
             >
-              <UploadCloud className="w-12 h-12 text-[#38BDF8] mx-auto mb-4" />
-              <div className="text-base font-bold text-[#F8FAFC]">
+              <UploadCloud className="w-9 h-9 text-ash mx-auto mb-4" />
+              <div className="text-sm font-semibold text-chalk">
                 Drag and drop your Hevy workout_data.csv
               </div>
-              <p className="text-xs text-[#94A3B8] mt-1.5">
+              <p className="text-xs text-dust mt-1.5">
                 Processed 100% locally on your computer with complete privacy
               </p>
 
               <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-                <label className="px-5 py-2.5 text-xs font-bold text-white bg-[#2563EB] hover:bg-[#1D4ED8] rounded-md shadow-sm cursor-pointer transition-all duration-150 hover:-translate-y-0.5 active:scale-95">
-                  Choose CSV File
+                <label className="px-4 py-2 text-[13px] font-medium text-white bg-ply hover:bg-ply-deep rounded-lg shadow-sm cursor-pointer transition-colors duration-150">
+                  Choose CSV file
                   <input
                     type="file"
                     accept=".csv"
@@ -247,24 +250,24 @@ export default function App() {
                 </label>
                 <button
                   onClick={() => setIsUploadModalOpen(true)}
-                  className="px-4 py-2.5 text-xs font-bold text-[#CBD5E1] bg-[#0B0F17] hover:bg-[#1E293B] border border-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95"
+                  className="px-4 py-2 text-[13px] font-medium text-chalk-2 bg-surface hover:bg-raised border border-line rounded-lg transition-colors duration-150"
                 >
-                  Paste CSV Text
+                  Paste CSV text
                 </button>
               </div>
             </div>
 
             {/* Quick Export Guide */}
-            <div className="bg-[#131D31] rounded-2xl p-5 border border-[#1E293B] text-xs text-[#94A3B8]">
-              <div className="font-bold text-[#F8FAFC] flex items-center gap-2 mb-2.5">
-                <Smartphone className="w-4 h-4 text-[#38BDF8]" />
+            <div className="bg-surface rounded-xl p-5 border border-line text-xs text-dust">
+              <div className="font-semibold text-chalk flex items-center gap-2 mb-2.5">
+                <Smartphone className="w-4 h-4 text-plate" />
                 How to get your CSV file from Hevy:
               </div>
               <ol className="list-decimal pl-5 space-y-1.5 text-[11px] leading-relaxed">
                 <li>Open the <strong>Hevy app</strong> on your phone.</li>
                 <li>Go to the <strong>Profile</strong> tab and tap the <strong>Settings gear icon</strong> in the upper right.</li>
                 <li>Scroll down to <strong>Export Data</strong> and select <strong>Export as CSV</strong>.</li>
-                <li>Drop the downloaded <code className="bg-[#0B0F17] px-1.5 py-0.5 rounded text-[#38BDF8]">workout_data.csv</code> file into the box above.</li>
+                <li>Drop the downloaded <code className="bg-void px-1.5 py-0.5 rounded text-plate">workout_data.csv</code> file into the box above.</li>
               </ol>
             </div>
           </div>
@@ -274,20 +277,20 @@ export default function App() {
         {parsedData && activeDataset && (
           <>
             {/* Top status bar */}
-            <div className="bg-[#131D31] border border-[#1E293B] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
+            <div className="bg-surface border border-line rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-sm">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-xl bg-[#1E3A8A]/50 text-[#38BDF8] flex items-center justify-center shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-raised text-ash flex items-center justify-center shrink-0">
                   <FileSpreadsheet className="w-4 h-4" />
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-[#F8FAFC] flex items-center gap-2">
+                  <div className="text-xs font-semibold text-chalk flex items-center gap-2">
                     <span>{activeDataset.filename}</span>
-                    <span className="text-[10px] text-[#38BDF8] font-mono bg-[#0C4A6E]/40 px-2 py-0.5 rounded-md border border-[#0284C7]/40">
+                    <span className="text-[10px] text-dust font-mono bg-raised px-2 py-0.5 rounded-[4px] border border-line">
                       {parsedData.totalWorkouts} workouts
                     </span>
                   </div>
-                  <div className="text-[11px] text-[#94A3B8] mt-0.5">
-                    {dateRangeStr} · Displaying in <strong className="text-[#38BDF8]">{unit}</strong>
+                  <div className="text-[11px] text-dust mt-0.5">
+                    {dateRangeStr} · Displaying in <strong className="text-plate">{unit}</strong>
                   </div>
                 </div>
               </div>
@@ -295,7 +298,7 @@ export default function App() {
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setIsUploadModalOpen(true)}
-                  className="text-xs font-semibold text-[#38BDF8] hover:underline px-2 py-1"
+                  className="text-xs font-semibold text-plate hover:underline px-2 py-1"
                 >
                   Upload another CSV
                 </button>
@@ -316,7 +319,6 @@ export default function App() {
                   totalPRs={totalPRs}
                   unit={unit}
                   dateRangeStr={dateRangeStr}
-                  workouts={parsedData.workouts}
                 />
 
                 {/* Activity Heatmap Calendar (At the top, not bottom!) */}
@@ -340,51 +342,51 @@ export default function App() {
                 {/* Split Row: Recent Workouts & Key Milestones */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
                   {/* Left Column: Recent Workouts preview */}
-                  <div className="lg:col-span-7 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
+                  <div className="lg:col-span-7 bg-surface rounded-xl p-4 sm:p-5 border border-line shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h3 className="text-sm font-bold text-[#F8FAFC] flex items-center gap-2">
-                            <Dumbbell className="w-4 h-4 text-[#38BDF8]" />
+                          <h3 className="text-sm font-semibold text-chalk flex items-center gap-2">
+                            <Dumbbell className="w-4 h-4 text-plate" />
                             Recent Training Sessions
                           </h3>
-                          <p className="text-xs text-[#94A3B8] mt-0.5">
+                          <p className="text-xs text-dust mt-0.5">
                             Latest logged workouts from your export
                           </p>
                         </div>
 
                         <button
                           onClick={() => setActiveView('workouts')}
-                          className="text-xs font-bold text-[#38BDF8] hover:underline flex items-center gap-1 transition-transform hover:translate-x-0.5 duration-150"
+                          className="text-xs font-semibold text-plate hover:underline flex items-center gap-1 hover:translate-x-0.5 duration-150"
                         >
                           <span>View All ({parsedData.totalWorkouts})</span>
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
                       </div>
 
-                      <div className="divide-y divide-[#1E293B]">
+                      <div className="divide-y divide-line">
                         {parsedData.workouts.slice(0, 5).map(w => {
                           const vol = unit === 'kg' ? w.totalVolumeKg : w.totalVolumeLbs;
                           return (
                             <div
                               key={w.id}
                               onClick={() => setSelectedWorkoutForModal(w)}
-                              className="py-3 flex items-center justify-between gap-3 hover:bg-[#1E293B]/40 px-2.5 rounded-md cursor-pointer transition-all duration-150 hover:-translate-y-0.5"
+                              className="py-3 flex items-center justify-between gap-3 hover:bg-raised/40 px-2.5 rounded-lg cursor-pointer transition-colors duration-150"
                             >
                               <div className="min-w-0 pr-1">
-                                <div className="font-bold text-xs sm:text-sm text-[#F8FAFC] truncate">
+                                <div className="font-semibold text-xs sm:text-sm text-chalk truncate">
                                   {w.title}
                                 </div>
-                                <div className="text-[11px] text-[#94A3B8] mt-0.5 truncate">
+                                <div className="text-[11px] text-dust mt-0.5 truncate">
                                   {w.startTime.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                                   {' · '}{w.durationMinutes} min · {w.exercises.length} exs
                                 </div>
                               </div>
                               <div className="text-right shrink-0">
-                                <div className="font-extrabold text-xs sm:text-sm text-[#F8FAFC] tabular-nums font-mono">
+                                <div className="font-semibold text-xs sm:text-sm text-chalk tabular-nums font-mono">
                                   {vol.toLocaleString()} {unit}
                                 </div>
-                                <div className="text-[10px] text-[#94A3B8]">
+                                <div className="text-[10px] text-dust">
                                   {w.totalSets} sets
                                 </div>
                               </div>
@@ -394,10 +396,10 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-[#1E293B] text-center">
+                    <div className="mt-4 pt-3 border-t border-line text-center">
                       <button
                         onClick={() => setActiveView('workouts')}
-                        className="w-full py-2.5 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
+                        className="w-full py-2.5 text-xs font-semibold text-chalk-2 bg-void hover:bg-raised rounded-lg transition-colors duration-150 border border-line"
                       >
                         Open Full Workout Log Explorer
                       </button>
@@ -405,22 +407,22 @@ export default function App() {
                   </div>
 
                   {/* Right Column: Top Exercises & PR Hall */}
-                  <div className="lg:col-span-5 bg-[#131D31] rounded-2xl p-4 sm:p-5 border border-[#1E293B] shadow-sm flex flex-col justify-between">
+                  <div className="lg:col-span-5 bg-surface rounded-xl p-4 sm:p-5 border border-line shadow-sm flex flex-col justify-between">
                     <div>
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h3 className="text-sm font-bold text-[#F8FAFC] flex items-center gap-2">
-                            <Trophy className="w-4 h-4 text-[#38BDF8]" />
+                          <h3 className="text-sm font-semibold text-chalk flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-plate" />
                             Key Exercise Milestones
                           </h3>
-                          <p className="text-xs text-[#94A3B8] mt-0.5">
+                          <p className="text-xs text-dust mt-0.5">
                             Heaviest loads and estimated 1RMs
                           </p>
                         </div>
 
                         <button
                           onClick={() => setActiveView('exercises')}
-                          className="text-xs font-bold text-[#38BDF8] hover:underline flex items-center gap-1 transition-transform hover:translate-x-0.5 duration-150"
+                          className="text-xs font-semibold text-plate hover:underline flex items-center gap-1 hover:translate-x-0.5 duration-150"
                         >
                           <span>Explore</span>
                           <ArrowRight className="w-3.5 h-3.5" />
@@ -439,22 +441,22 @@ export default function App() {
                               <div
                                 key={ex.exerciseTitle}
                                 onClick={() => handleDrillDownExercise(ex.exerciseTitle)}
-                                className="p-2.5 rounded-md bg-[#0B0F17] border border-[#1E293B] hover:border-[#3B82F6]/50 flex items-center justify-between cursor-pointer transition-all duration-150 hover:-translate-y-0.5 active:scale-[0.99]"
+                                className="p-2.5 rounded-lg bg-void border border-line hover:border-plate/50 flex items-center justify-between cursor-pointer transition-colors duration-150 active:scale-[0.99]"
                               >
                                 <div className="min-w-0 pr-2">
-                                  <div className="font-bold text-xs text-[#F8FAFC] truncate">
+                                  <div className="font-semibold text-xs text-chalk truncate">
                                     {ex.exerciseTitle}
                                   </div>
-                                  <div className="text-[10px] text-[#94A3B8] mt-0.5">
+                                  <div className="text-[10px] text-dust mt-0.5">
                                     {ex.muscleGroup} · {ex.totalSets} sets
                                   </div>
                                 </div>
 
                                 <div className="text-right shrink-0">
-                                  <div className="font-extrabold text-xs text-[#F8FAFC] tabular-nums font-mono">
+                                  <div className="font-semibold text-xs text-chalk tabular-nums font-mono">
                                     {topWeight > 0 ? `${topWeight} ${unit}` : 'BW'}
                                   </div>
-                                  <div className="text-[10px] text-[#38BDF8] font-bold tabular-nums font-mono">
+                                  <div className="text-[10px] text-plate font-semibold tabular-nums font-mono">
                                     Est. 1RM: {top1RM} {unit}
                                   </div>
                                 </div>
@@ -464,10 +466,10 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-[#1E293B] text-center">
+                    <div className="mt-4 pt-3 border-t border-line text-center">
                       <button
                         onClick={() => setActiveView('muscles')}
-                        className="w-full py-2.5 text-xs font-bold text-[#E2E8F0] bg-[#0B0F17] hover:bg-[#1E293B] rounded-md transition-all duration-150 hover:-translate-y-0.5 active:scale-95 border border-[#1E293B]"
+                        className="w-full py-2.5 text-xs font-semibold text-chalk-2 bg-void hover:bg-raised rounded-lg transition-colors duration-150 border border-line"
                       >
                         Check Kinetic Muscle Balance (Push/Pull/Legs)
                       </button>
@@ -489,7 +491,14 @@ export default function App() {
               </div>
             )}
 
-            {/* VIEW 3: EXERCISES & PRS */}
+            {/* VIEW 3: ROUTINES */}
+            {activeView === 'routines' && (
+              <div className="animate-in fade-in">
+                <RoutinesView workouts={parsedData.workouts} unit={unit} />
+              </div>
+            )}
+
+            {/* VIEW 4: EXERCISES & PRS */}
             {activeView === 'exercises' && (
               <div className="animate-in fade-in">
                 <ExerciseAnalytics
@@ -501,7 +510,7 @@ export default function App() {
               </div>
             )}
 
-            {/* VIEW 4: MUSCLE BALANCE */}
+            {/* VIEW 5: MUSCLE BALANCE */}
             {activeView === 'muscles' && (
               <div className="animate-in fade-in">
                 <MuscleDistribution
