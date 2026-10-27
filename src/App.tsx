@@ -316,6 +316,7 @@ export default function App() {
                   totalPRs={totalPRs}
                   unit={unit}
                   dateRangeStr={dateRangeStr}
+                  workouts={parsedData.workouts}
                 />
 
                 {/* Activity Heatmap Calendar (At the top, not bottom!) */}
