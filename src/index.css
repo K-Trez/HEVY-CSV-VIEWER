@@ -189,27 +189,7 @@ button,
 
 /* ---- Heatmap ---------------------------------------------------------- */
 
-.heat-cube-0 {
-  background-color: var(--color-raised);
-  border-color: var(--color-line);
-}
-
-.heat-cube-1 {
-  background-color: color-mix(in srgb, var(--color-plate) 24%, var(--color-raised));
-  border-color: color-mix(in srgb, var(--color-plate) 36%, var(--color-raised));
-}
-
-.heat-cube-2 {
-  background-color: color-mix(in srgb, var(--color-plate) 52%, var(--color-raised));
-  border-color: var(--color-plate);
-}
-
 .heat-cube-3 {
   background-color: var(--color-plate);
   border-color: var(--color-plate);
-}
-
-.heat-cube-4 {
-  background-color: var(--color-ply-deep);
-  border-color: var(--color-ply-deep);
 }

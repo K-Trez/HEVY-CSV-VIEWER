@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Workout, UnitPreference } from '../types/workout';
-import { Radar, Layers, Weight, Sparkles } from 'lucide-react';
+import { Radar, Layers, Weight } from 'lucide-react';
 
 interface MuscleRadarChartProps {
   workouts: Workout[];
@@ -454,11 +454,6 @@ export const MuscleRadarChart: React.FC<MuscleRadarChartProps> = ({
             })}
           </svg>
 
-                {/* Quick Info Chip Under Radar */}
-                <div className="flex items-center gap-1.5 text-[11px] text-dust mt-2 text-center">
-                  <Sparkles className="w-3.5 h-3.5 text-plate shrink-0" />
-                  <span>Hover or tap vertices to inspect volume & set shares</span>
-                </div>
               </div>
             </div>
           </div>

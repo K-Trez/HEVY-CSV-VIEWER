@@ -11,7 +11,7 @@ import { MuscleDistribution } from './components/MuscleDistribution';
 import { MuscleRadarChart } from './components/MuscleRadarChart';
 import { UploadModal } from './components/UploadModal';
 import { WorkoutDetailModal } from './components/WorkoutDetailModal';
-import { Dumbbell, ArrowRight, Trophy, UploadCloud, FileSpreadsheet, Smartphone, AlertCircle } from 'lucide-react';
+import { Dumbbell, ArrowRight, Trophy, UploadCloud, FileSpreadsheet, Smartphone, AlertCircle, CheckCircle2, X } from 'lucide-react';
 
 export default function App() {
   const [unit, setUnit] = useState<UnitPreference>(() => {
@@ -59,6 +59,7 @@ export default function App() {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const [shareNotice, setShareNotice] = useState<{ kind: 'success' | 'error'; message: string } | null>(null);
 
   // Sync unit preference with localStorage
   const handleToggleUnit = (newUnit: UnitPreference) => {
@@ -66,13 +67,13 @@ export default function App() {
     localStorage.setItem('hevy_unit_pref', newUnit);
   };
 
-  // Load custom user CSV and save to localStorage
-  const handleLoadCustomCSV = (csvText: string, filename: string) => {
+  // Load custom user CSV and save to localStorage. Returns the workout count, or null on failure.
+  const handleLoadCustomCSV = (csvText: string, filename: string): number | null => {
     try {
       const parsed = parseHevyCSV(csvText);
       if (parsed.workouts.length === 0) {
         setUploadError('Could not find any workouts in this CSV. Please make sure this is your Hevy workout_data.csv export.');
-        return;
+        return null;
       }
 
       localStorage.setItem('hevy_saved_csv', csvText);
@@ -92,8 +93,10 @@ export default function App() {
       });
       setParsedData(parsed);
       setUploadError(null);
+      return parsed.totalWorkouts;
     } catch (err: any) {
       setUploadError(`Error parsing CSV: ${err.message || 'Invalid format'}`);
+      return null;
     }
   };
 
@@ -173,6 +176,75 @@ export default function App() {
     document.documentElement.classList.toggle('theme-light', theme === 'light');
   }, [theme]);
 
+  // A CSV shared from the Hevy app is parked in Cache Storage by the service worker.
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const shareState = params.get('share');
+    if (!shareState) return;
+
+    let cancelled = false;
+    const cleanUrl = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.delete('share');
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    };
+
+    (async () => {
+      try {
+        if (shareState === 'missing' || shareState === 'empty' || shareState === 'error') {
+          const messages: Record<string, string> = {
+            missing: 'No CSV file came through that share.',
+            empty: 'That shared CSV was empty.',
+            error: 'Could not read the shared file.',
+          };
+          if (!cancelled) setShareNotice({ kind: 'error', message: messages[shareState] });
+          return;
+        }
+
+        const cache = await caches.open('hevy-share-v1');
+        const cached = await cache.match('/__shared_csv__');
+        if (!cached) {
+          if (!cancelled) setShareNotice({ kind: 'error', message: 'That shared CSV is no longer available.' });
+          return;
+        }
+
+        await cache.delete('/__shared_csv__');
+        const text = await cached.text();
+        const rawName = cached.headers.get('X-Filename') || 'workout_data.csv';
+        let filename = rawName;
+        try {
+          filename = decodeURIComponent(rawName);
+        } catch {
+          /* keep the raw header value */
+        }
+
+        if (cancelled) return;
+        const count = handleLoadCustomCSV(text, filename);
+        setShareNotice(
+          count
+            ? { kind: 'success', message: `${filename} imported — ${count} workouts.` }
+            : { kind: 'error', message: 'That file could not be read as a Hevy CSV export.' }
+        );
+      } catch {
+        if (!cancelled) setShareNotice({ kind: 'error', message: 'Could not import the shared CSV.' });
+      } finally {
+        cleanUrl();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Runs once: the share query is consumed on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  React.useEffect(() => {
+    if (shareNotice?.kind !== 'success') return;
+    const timer = window.setTimeout(() => setShareNotice(null), 6000);
+    return () => window.clearTimeout(timer);
+  }, [shareNotice]);
+
   return (
     <div className="min-h-screen flex flex-col font-sans transition-colors duration-200 overflow-x-hidden bg-void text-chalk">
       {/* Navigation Header */}
@@ -190,6 +262,32 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 md:px-8 py-4 sm:py-6 space-y-4 sm:space-y-6">
+        {shareNotice && (
+          <div
+            role={shareNotice.kind === 'error' ? 'alert' : 'status'}
+            className={`flex items-start justify-between gap-3 rounded-lg border px-3.5 py-2.5 text-xs ${
+              shareNotice.kind === 'error'
+                ? 'border-danger/25 bg-tint-ply/60 text-danger'
+                : 'border-grn/25 bg-tint-grn/50 text-grn'
+            }`}
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              {shareNotice.kind === 'error' ? (
+                <AlertCircle className="w-4 h-4 shrink-0" />
+              ) : (
+                <CheckCircle2 className="w-4 h-4 shrink-0" />
+              )}
+              <span className="truncate">{shareNotice.message}</span>
+            </div>
+            <button
+              onClick={() => setShareNotice(null)}
+              aria-label="Dismiss notification"
+              className="shrink-0 opacity-70 hover:opacity-100"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
         {/* If NO data is loaded: Landing / Upload Dropzone Screen */}
         {!parsedData && (
           <div className="max-w-2xl mx-auto py-12 space-y-6 animate-in fade-in">
