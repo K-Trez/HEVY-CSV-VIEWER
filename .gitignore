@@ -7,4 +7,9 @@ coverage/
 .env*
 !.env.example
 screenshots/
-
+android/.gradle/
+android/build/
+android/app/build/
+android/app/src/main/assets/www/
+.local-backup-2026-10-27/
+context.md
