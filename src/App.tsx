@@ -13,6 +13,12 @@ import { UploadModal } from './components/UploadModal';
 import { WorkoutDetailModal } from './components/WorkoutDetailModal';
 import { Dumbbell, ArrowRight, Trophy, UploadCloud, FileSpreadsheet, Smartphone, AlertCircle, CheckCircle2, X } from 'lucide-react';
 
+declare global {
+  interface Window {
+    HevyNative?: { consumeShare?: () => string };
+  }
+}
+
 export default function App() {
   const [unit, setUnit] = useState<UnitPreference>(() => {
     return (localStorage.getItem('hevy_unit_pref') as UnitPreference) || 'kg';
@@ -244,6 +250,34 @@ export default function App() {
     const timer = window.setTimeout(() => setShareNotice(null), 6000);
     return () => window.clearTimeout(timer);
   }, [shareNotice]);
+
+  // In the Android shell, a CSV shared from Hevy is handed over by the native bridge.
+  React.useEffect(() => {
+    const pullNativeShare = () => {
+      if (!window.HevyNative?.consumeShare) return;
+      try {
+        const raw = window.HevyNative.consumeShare();
+        if (!raw) return;
+        const payload = JSON.parse(raw) as { csv?: string; filename?: string };
+        if (!payload.csv) return;
+        const filename = payload.filename || 'workout_data.csv';
+        const count = handleLoadCustomCSV(payload.csv, filename);
+        setShareNotice(
+          count
+            ? { kind: 'success', message: `${filename} imported — ${count} workouts.` }
+            : { kind: 'error', message: 'That file could not be read as a Hevy CSV export.' }
+        );
+      } catch {
+        setShareNotice({ kind: 'error', message: 'Could not import the shared CSV.' });
+      }
+    };
+
+    pullNativeShare();
+    window.addEventListener('hevy-native-share', pullNativeShare);
+    return () => window.removeEventListener('hevy-native-share', pullNativeShare);
+    // Runs once: the native bridge outlives React.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="min-h-screen flex flex-col font-sans transition-colors duration-200 overflow-x-hidden bg-void text-chalk">
