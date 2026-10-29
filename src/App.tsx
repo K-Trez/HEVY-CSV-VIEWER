@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { UnitPreference, DatasetInfo, Workout } from './types/workout';
 import { parseHevyCSV, ParsedHevyData } from './utils/hevyParser';
 import { Header } from './components/Header';
+import { BrandMark } from './components/BrandMark';
 import { MetricCards } from './components/MetricCards';
 import { HeatmapCalendar } from './components/HeatmapCalendar';
 import { WorkoutList } from './components/WorkoutList';
@@ -326,11 +327,9 @@ export default function App() {
         {!parsedData && (
           <div className="max-w-2xl mx-auto py-12 space-y-6 animate-in fade-in">
             <div className="text-center space-y-3">
-              <div className="w-12 h-12 rounded-xl bg-tint-plate text-plate border border-plate/20 flex items-center justify-center mx-auto">
-                <Dumbbell className="w-6 h-6 stroke-[2.2]" />
-              </div>
+              <BrandMark className="w-12 h-12 mx-auto" />
               <h1 className="text-2xl sm:text-3xl font-semibold text-chalk">
-                Hevy Workout Vault
+                Hevy Ledger
               </h1>
               <p className="text-sm text-dust max-w-md mx-auto">
                 Upload your <code className="bg-raised px-1.5 py-0.5 rounded text-plate">workout_data.csv</code> to explore your all-time workout logs, 1RM progression charts, and muscle splits.

@@ -1,6 +1,7 @@
 import React from 'react';
 import { UnitPreference, DatasetInfo } from '../types/workout';
-import { Dumbbell, UploadCloud, FileText, Trash2, Sun, Moon } from 'lucide-react';
+import { BrandMark } from './BrandMark';
+import { UploadCloud, FileText, Trash2, Sun, Moon } from 'lucide-react';
 
 type View = 'overview' | 'workouts' | 'routines' | 'exercises' | 'muscles';
 
@@ -42,12 +43,10 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="sticky top-0 z-30 bg-void/85 backdrop-blur-md border-b border-line px-3 sm:px-6">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 sm:gap-6 py-2.5">
         <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-plate text-on-plate flex items-center justify-center">
-            <Dumbbell className="w-4 h-4 stroke-[2.2]" />
-          </div>
+          <BrandMark className="w-7 h-7 sm:w-8 sm:h-8" />
           <div className="flex flex-col">
             <span className="type-display text-sm sm:text-[15px] text-chalk whitespace-nowrap">
-              Hevy Vault
+              Hevy Ledger
             </span>
             <span className="hidden sm:block text-[11px] leading-tight text-ash">
               Workout analytics

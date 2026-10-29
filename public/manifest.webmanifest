@@ -1,7 +1,7 @@
 {
-  "name": "Hevy Vault",
-  "short_name": "Hevy Vault",
-  "description": "Private, on-device analytics for your Hevy workout export.",
+  "name": "Hevy Ledger",
+  "short_name": "Hevy Ledger",
+  "description": "Private, on-device training ledger for your Hevy workout export.",
   "id": "/",
   "start_url": "/",
   "scope": "/",
