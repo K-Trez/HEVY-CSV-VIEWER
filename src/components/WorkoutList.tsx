@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Workout, UnitPreference } from '../types/workout';
 import { MUSCLE_COLORS } from '../utils/muscleTaxonomy';
 import { Search, Filter, ArrowUpDown, ChevronDown, ChevronUp, Trophy, Clock, Dumbbell, Calendar, FileText } from 'lucide-react';
@@ -20,6 +20,8 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
   const [routineFilter, setRoutineFilter] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'date-desc' | 'date-asc' | 'volume-desc'>('date-desc');
   const [expandedWorkouts, setExpandedWorkouts] = useState<Record<string, boolean>>({});
+  const [visibleCount, setVisibleCount] = useState(30);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
 
   const uniqueRoutines = useMemo(() => {
     const set = new Set<string>();
@@ -51,6 +53,26 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
         return 0;
       });
   }, [workouts, searchTerm, routineFilter, sortBy, unit]);
+
+  useEffect(() => {
+    setVisibleCount(30);
+  }, [searchTerm, routineFilter, sortBy]);
+
+  useEffect(() => {
+    if (visibleCount >= filteredWorkouts.length) return;
+    const node = loadMoreRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries.some(entry => entry.isIntersecting)) {
+          setVisibleCount(count => Math.min(count + 30, filteredWorkouts.length));
+        }
+      },
+      { rootMargin: '600px 0px' }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [visibleCount, filteredWorkouts.length]);
 
   const toggleExpand = (id: string) => {
     setExpandedWorkouts(prev => ({
@@ -143,7 +165,8 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
       {/* Result Count */}
       <div className="flex items-center justify-between text-xs text-dust px-1">
         <div>
-          Showing <span className="font-semibold text-chalk">{filteredWorkouts.length}</span> of {workouts.length} workouts
+          Showing <span className="font-semibold text-chalk">{Math.min(visibleCount, filteredWorkouts.length)}</span> of {filteredWorkouts.length} workouts
+          {filteredWorkouts.length !== workouts.length && ` · ${workouts.length} total`}
         </div>
         {searchTerm && (
           <button
@@ -166,8 +189,8 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
         </div>
       ) : (
         <div className="space-y-3.5">
-          {filteredWorkouts.map(workout => {
-            const isExpanded = expandedWorkouts[workout.id] ?? true;
+          {filteredWorkouts.slice(0, visibleCount).map(workout => {
+            const isExpanded = expandedWorkouts[workout.id] ?? false;
             const volume = unit === 'kg' ? workout.totalVolumeKg : workout.totalVolumeLbs;
             const prCount = workout.exercises.reduce(
               (acc, ex) => acc + ex.sets.filter(s => s.isPR).length,
@@ -177,7 +200,7 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
             return (
               <div
                 key={workout.id}
-                className="bg-surface rounded-xl border border-line shadow-sm hover:border-plate/40 transition-colors overflow-hidden"
+                className="bg-surface rounded-xl border border-line shadow-sm hover:border-plate/40 transition-colors overflow-hidden [content-visibility:auto] [contain-intrinsic-size:auto_180px]"
               >
                 {/* Workout Card Header */}
                 <div
@@ -380,6 +403,20 @@ export const WorkoutList: React.FC<WorkoutListProps> = ({
               </div>
             );
           })}
+
+          {visibleCount < filteredWorkouts.length && (
+            <div ref={loadMoreRef} className="flex flex-col items-center gap-2 pt-2 pb-4">
+              <button
+                onClick={() => setVisibleCount(count => Math.min(count + 30, filteredWorkouts.length))}
+                className="px-4 py-2 text-xs font-medium text-chalk-2 bg-surface hover:bg-raised border border-line rounded-lg transition-colors"
+              >
+                Load 30 more
+              </button>
+              <span className="text-[11px] text-ash tabular-nums">
+                {visibleCount} of {filteredWorkouts.length} shown
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>
