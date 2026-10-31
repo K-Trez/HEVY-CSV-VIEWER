@@ -70,14 +70,16 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
 
   // Build a complete Jan 1 - Dec 31 calendar grid for a specific year
   const buildCalendarForYear = (year: number): YearCalendarData => {
+    const mondayIndex = (date: Date) => (date.getDay() + 6) % 7;
+
     const jan1 = new Date(year, 0, 1);
     const startDate = new Date(jan1);
-    startDate.setDate(startDate.getDate() - startDate.getDay()); // Sunday before Jan 1
+    startDate.setDate(startDate.getDate() - mondayIndex(startDate)); // Monday before Jan 1
     startDate.setHours(0, 0, 0, 0);
 
     const dec31 = new Date(year, 11, 31);
     const endDate = new Date(dec31);
-    endDate.setDate(endDate.getDate() + (6 - endDate.getDay())); // Saturday after Dec 31
+    endDate.setDate(endDate.getDate() + (6 - mondayIndex(endDate))); // Sunday after Dec 31
     endDate.setHours(23, 59, 59, 999);
 
     const diffDays = Math.round((endDate.getTime() - startDate.getTime()) / (24 * 60 * 60 * 1000));
@@ -195,7 +197,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
     return 'heat-cube-3 hover:brightness-110';
   };
 
-  const dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  const dayNames = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
   return (
     <div className="bg-surface rounded-xl p-3.5 sm:p-5 border border-line shadow-sm relative space-y-3.5">
       {/* Top Header Controls */}
@@ -293,7 +295,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
                   <div className="flex flex-col gap-[1px] text-[9px] font-semibold text-ash justify-between py-0.5 select-none shrink-0 w-2 text-center">
                     {dayNames.map((name, i) => (
                       <span key={i} className="leading-none text-center">
-                        {i % 2 === 1 ? name : ''}
+                        {i % 2 === 0 ? name : ''}
                       </span>
                     ))}
                   </div>
