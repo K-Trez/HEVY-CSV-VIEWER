@@ -20,6 +20,19 @@ interface YearCalendarData {
   maxStreakWeeks: number;
 }
 
+// Heatmap keys must follow the local calendar, not UTC, or a +TZ user's
+// evening workout lands on the wrong weekday.
+const toDateKey = (date: Date): string => {
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${date.getFullYear()}-${month}-${day}`;
+};
+
+const fromDateKey = (key: string): Date => {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
+};
+
 export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
   workouts,
   unit,
@@ -47,7 +60,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
   const workoutDateMap = useMemo(() => {
     const map = new Map<string, Workout[]>();
     workouts.forEach(w => {
-      const key = w.startTime.toISOString().split('T')[0];
+      const key = toDateKey(w.startTime);
       const existing = map.get(key) || [];
       existing.push(w);
       map.set(key, existing);
@@ -82,7 +95,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
       const weekDays: Array<{ date: Date; dateStr: string; isInYear: boolean; workouts: Workout[] }> = [];
       for (let d = 0; d < 7; d++) {
         const dCopy = new Date(curr);
-        const dateStr = dCopy.toISOString().split('T')[0];
+        const dateStr = toDateKey(dCopy);
         const isInYear = dCopy.getFullYear() === year;
         const dayWorkouts = isInYear ? (workoutDateMap.get(dateStr) || []) : [];
 
@@ -364,7 +377,7 @@ export const HeatmapCalendar: React.FC<HeatmapCalendarProps> = ({
           }}
         >
           <div className="font-semibold text-[11px] text-dust">
-            {new Date(hoveredDay.dateStr).toLocaleDateString('en-US', {
+            {fromDateKey(hoveredDay.dateStr).toLocaleDateString('en-US', {
               weekday: 'short',
               month: 'short',
               day: 'numeric',
